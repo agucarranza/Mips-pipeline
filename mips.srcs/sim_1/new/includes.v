@@ -1,0 +1,5 @@
+`include "./Mux.v"
+`include "./PC.v"
+`include "./Instruction_memory.v"
+`include "./Add.v"
+`include "./IF_ID.v"

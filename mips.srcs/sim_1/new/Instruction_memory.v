@@ -6,7 +6,7 @@ module Instruction_memory (
 	output wire [31:0] o_Instruction
 );
 
-	reg [31:0] memory  [1024];
+	reg [31:0] memory  [0:1023];
 	reg [31:0] temporal      ;
 
 //Leer

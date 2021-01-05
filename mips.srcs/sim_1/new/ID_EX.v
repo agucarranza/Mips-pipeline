@@ -8,6 +8,8 @@ module ID_EX (
 	input  wire [31:0] i_Read_data_1,
 	input  wire [31:0] i_Read_data_2,
 	input  wire [31:0] i_Immediate  ,
+	input  wire [ 4:0] i_rt         ,
+	input  wire [ 4:0] i_rd         ,
 	// WB - Control - IN
 	input  wire        i_RegWrite   ,
 	input  wire        i_MemtoReg   ,
@@ -24,6 +26,8 @@ module ID_EX (
 	output wire [31:0] o_Read_data_1,
 	output wire [31:0] o_Read_data_2,
 	output wire [31:0] o_Immediate  ,
+	output wire [ 4:0] o_rt         ,
+	output wire [ 4:0] o_rd         ,
 	// WB - Control - OUT
 	output wire        o_RegWrite   ,
 	output wire        o_MemtoReg   ,
@@ -41,6 +45,8 @@ module ID_EX (
 	reg [31:0] Read_data_1;
 	reg [31:0] Read_data_2;
 	reg [31:0] Immediate  ;
+	reg [ 4:0] rt         ;
+	reg [ 4:0] rd         ;
 	reg        RegWrite   ;
 	reg        MemtoReg   ;
 	reg        Branch     ;
@@ -50,13 +56,14 @@ module ID_EX (
 	reg [ 1:0] ALUOp      ;
 	reg        ALUSrc     ;
 
-
 	always @(posedge clk) begin : proc_Registers
 		if(rst) begin
 			PC_Address  <= 32'b0;
 			Read_data_1 <= 32'b0;
 			Read_data_2 <= 32'b0;
 			Immediate   <= 32'b0;
+			rt          <= 5'b0;
+			rd          <= 5'b0;
 
 		end else begin
 			// Registers
@@ -64,17 +71,20 @@ module ID_EX (
 			Read_data_1 <= i_Read_data_1;
 			Read_data_2 <= i_Read_data_2;
 			Immediate   <= i_Immediate  ;
+			rt          <= i_rt;
+			rd          <= i_rd;
+
 			// Control
-			RegWrite    <= i_RegWrite   ;
-			MemtoReg    <= i_MemtoReg   ;
-			
-			Branch      <= i_Branch     ;
-			MemRead     <= i_MemRead    ;
-			MemWrite    <= i_MemWrite   ;
-			
-			RegDst      <= i_RegDst     ;
-			ALUOp       <= i_ALUOp      ;
-			ALUSrc      <= i_ALUSrc     ;
+			RegWrite <= i_RegWrite   ;
+			MemtoReg <= i_MemtoReg   ;
+
+			Branch   <= i_Branch     ;
+			MemRead  <= i_MemRead    ;
+			MemWrite <= i_MemWrite   ;
+
+			RegDst <= i_RegDst     ;
+			ALUOp  <= i_ALUOp      ;
+			ALUSrc <= i_ALUSrc     ;
 		end
 	end
 	// Registers
@@ -82,17 +92,19 @@ module ID_EX (
 	assign o_Read_data_1 = Read_data_1;
 	assign o_Read_data_2 = Read_data_2;
 	assign o_Immediate   = Immediate;
+	assign o_rt          = rt;
+	assign o_rd          = rd;
 	// Control
-	assign o_RegWrite    = RegWrite   ;
-	assign o_MemtoReg    = MemtoReg   ;
-	
-	assign o_Branch      = Branch     ;
-	assign o_MemRead     = MemRead    ;
-	assign o_MemWrite    = MemWrite   ;
-	
-	assign o_RegDst      = RegDst     ;
-	assign o_ALUOp       = ALUOp      ;
-	assign o_ALUSrc      = ALUSrc     ;
+	assign o_RegWrite = RegWrite   ;
+	assign o_MemtoReg = MemtoReg   ;
+
+	assign o_Branch   = Branch     ;
+	assign o_MemRead  = MemRead    ;
+	assign o_MemWrite = MemWrite   ;
+
+	assign o_RegDst = RegDst     ;
+	assign o_ALUOp  = ALUOp      ;
+	assign o_ALUSrc = ALUSrc     ;
 
 endmodule : ID_EX
 
