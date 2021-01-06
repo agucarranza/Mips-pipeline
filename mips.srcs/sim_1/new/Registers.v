@@ -12,7 +12,7 @@ module Registers (
 	output wire [31:0] o_Read_data_2
 );
 
-	reg [31:0] registers  [31:0]; //Array se pone la cantidad, no los bits!!
+	reg [31:0] registers  [0:31]; //Array se pone la cantidad, no los bits!!
 	reg [31:0] Read_data_1      ;
 	reg [31:0] Read_data_2      ;
 

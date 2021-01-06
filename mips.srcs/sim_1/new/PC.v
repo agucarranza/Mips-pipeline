@@ -2,18 +2,18 @@
 
 module PC
 (
-    input wire clk,
+    input wire i_clk,
     input wire [31:0] i_address,
     output wire [31:0] o_address
 );
 
 reg [31:0] ProgCounter;
 
-always @(posedge clk) begin
+always @(posedge i_clk) begin
     ProgCounter <= i_address; 
 end
 
-assign ProgCounter = o_address;
+assign o_address = ProgCounter;
 
 endmodule
  
