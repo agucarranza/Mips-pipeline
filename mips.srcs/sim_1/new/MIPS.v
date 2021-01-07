@@ -1,42 +1,51 @@
 `timescale 1ns / 1ps
 `include "Mux.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
 `include "Registers.v" `include "Control.v" `include "ID_EX.v"
-`include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v"
+`include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
+`include "MEM_WB.v"
 
 module MIPS
 	(
 		input clk, // Clock
 		input rst  // Asynchronous reset active low
 	);
+
 // Control
 wire       PCSrc   ;
 wire       RegWrite;
 wire       RegDst  ;
 wire       ALUSrc  ;
 wire [1:0] ALUOp   ;
+wire       MemWrite;
+wire       MemRead ;
+wire       MemtoReg;
+wire       Branch  ;
 
-wire       ID_RegDst  ;
-wire [1:0] ID_ALUOp   ;
-wire       ID_ALUSrc  ;
-wire       ID_Branch  ;
-wire       ID_MemRead ;
-wire       ID_MemWrite;
-wire       ID_RegWrite;
-wire       ID_MemtoReg;
-wire       EX_Branch  ;
-wire       EX_MemRead ;
-wire       EX_MemWrite;
-wire       EX_RegWrite;
-wire       EX_MemtoReg;
+wire       ID_RegDst   ;
+wire [1:0] ID_ALUOp    ;
+wire       ID_ALUSrc   ;
+wire       ID_Branch   ;
+wire       ID_MemRead  ;
+wire       ID_MemWrite ;
+wire       ID_RegWrite ;
+wire       ID_MemtoReg ;
+wire       EX_Branch   ;
+wire       EX_MemRead  ;
+wire       EX_MemWrite ;
+wire       EX_RegWrite ;
+wire       EX_MemtoReg ;
+wire       MEM_RegWrite;
+wire       MEM_MemtoReg;
+
 // Data
-wire [31:0] PC_to_AddPC_to_InstMem       ;
-wire [31:0] MuxPCSrc_to_PC               ;
-wire [31:0] InstMem_to_IFID              ; // Salida Memoria de Instrucciones
-wire [31:0] AddPC_to_MuxPCSrc_to_IFID    ; // Salida AddPC
-wire [31:0] EX_MEM_Add_result_to_MuxPCSrc;
+wire [31:0] PC_to_AddPC_to_InstMem     ;
+wire [31:0] MuxPCSrc_to_PC             ;
+wire [31:0] InstMem_to_IFID            ; // Salida Memoria de Instrucciones
+wire [31:0] AddPC_to_MuxPCSrc_to_IFID  ; // Salida AddPC
+wire [31:0] EXMEM_to_MuxPCSrc_AddResult;
 // ID
 wire [31:0] Instruction                       ;
-wire [ 4:0] MEM_WB_to_Registers_WriteRegister ;
+wire [ 4:0] MEMWB_to_Registers_WriteRegister  ;
 wire [31:0] MuxMemtoReg_to_Registers_WriteData;
 wire [31:0] IFID_to_IDEX_PC_Address           ;
 wire [31:0] Registers_to_IDEX_ReadData1       ;
@@ -54,18 +63,23 @@ wire [ 3:0] ALUControl_to_ALU_Operation                     ;
 wire [31:0] Add_to_EXMEM_AddResult                          ;
 wire [31:0] ALU_to_EXMEM_ALUResult                          ;
 wire [ 4:0] MuxRegDst_to_EXMEM_Result                       ;
+// MEM
+wire [31:0] EXMEM_to_DataMem_to_MEMWB_Address;
+wire        EXMEM_to_Branch_Zero             ;
+wire [31:0] EXMEM_to_DataMem_WriteData       ;
+wire [ 4:0] EXMEM_to_MEMWB_Result            ;
+wire [31:0] DataMem_to_MEMWB_ReadData        ;
+// WB
+wire [31:0] MEMWB_to_MuxMemtoReg_ReadData;
+wire [31:0] MEMWB_to_MuxMemtoReg_Address ;
 
-
-
-
-
-
+// IF
 
 Mux i_MuxPCSrc (
-	.i_Control(PCSrc                        ),
-	.i_Input_0(AddPC_to_MuxPCSrc_to_IFID    ),
-	.i_Input_1(EX_MEM_Add_result_to_MuxPCSrc),
-	.o_Salida (MuxPCSrc_to_PC               )
+	.i_Control(PCSrc                      ),
+	.i_Input_0(AddPC_to_MuxPCSrc_to_IFID  ),
+	.i_Input_1(EXMEM_to_MuxPCSrc_AddResult),
+	.o_Salida (MuxPCSrc_to_PC             )
 );
 
 PC i_PC (
@@ -96,13 +110,15 @@ IF_ID i_IF_ID (
 	.o_Instruction(Instruction              )
 );
 
+// ID
+
 Registers i_Registers (
 	.i_clk            (clk                               ),
 	.i_rst            (rst                               ),
 	.i_RegWrite       (RegWrite                          ),
 	.i_Read_register_1(Instruction[25:21]                ),
 	.i_Read_register_2(Instruction[20:16]                ),
-	.i_Write_register (MEM_WB_to_Registers_WriteRegister ),
+	.i_Write_register (MEMWB_to_Registers_WriteRegister  ),
 	.i_Write_data     (MuxMemtoReg_to_Registers_WriteData),
 	.o_Read_data_1    (Registers_to_IDEX_ReadData1       ),
 	.o_Read_data_2    (Registers_to_IDEX_ReadData2       )
@@ -169,7 +185,7 @@ ALU i_ALU (
 	.o_ALU_Result(ALU_to_EXMEM_ALUResult     )
 );
 
-Mux i_Mux_ALUSrc (
+Mux i_MuxALUSrc (
 	.i_Control(ALUSrc                                          ),
 	.i_Input_0(IDEX_to_MuxALUSrc_to_EXMEM_ReadData2            ),
 	.i_Input_1(IDEX_to_ALUControl_to_Add_to_MuxALUSrc_Immediate),
@@ -183,7 +199,7 @@ ALU_control i_ALU_control (
 );
 
 
-Mux #(.BUS_SIZE(5)) i_Mux_RegDst (
+Mux #(.BUS_SIZE(5)) i_MuxRegDst (
 	.i_Control(RegDst                   ),
 	.i_Input_0(IDEX_to_MuxRegDst_rt_0   ),
 	.i_Input_1(IDEX_to_MuxRegDst_rd_1   ),
@@ -203,19 +219,54 @@ EX_MEM i_EX_MEM (
 	.i_Branch          (EX_Branch                           ),
 	.i_MemRead         (EX_MemRead                          ),
 	.i_MemWrite        (EX_MemWrite                         ),
-	.o_Add_result      (o_Add_result                        ), // Completar
-	.o_Zero            (o_Zero                              ), // Completar
-	.o_ALU_result      (o_ALU_result                        ), // Completar
-	.o_Read_data_2     (o_Read_data_2                       ), // Completar
-	.o_MuxRegDst_result(o_MuxRegDst_result                  ), // Completar
-	.o_RegWrite        (o_RegWrite                          ), // Completar
-	.o_MemtoReg        (o_MemtoReg                          ), // Completar
-	.o_Branch          (o_Branch                            ), // Completar
-	.o_MemRead         (o_MemRead                           ), // Completar
-	.o_MemWrite        (o_MemWrite                          ) // Completar
+	.o_Add_result      (EXMEM_to_MuxPCSrc_AddResult         ),
+	.o_Zero            (EXMEM_to_Branch_Zero                ),
+	.o_ALU_result      (EXMEM_to_DataMem_to_MEMWB_Address   ), // ALUResult -> Address
+	.o_Read_data_2     (EXMEM_to_DataMem_WriteData          ), // ReadData2 -> WriteData
+	.o_MuxRegDst_result(EXMEM_to_MEMWB_Result               ), // MuxRegDst -> Result
+	.o_RegWrite        (MEM_RegWrite                        ),
+	.o_MemtoReg        (MEM_MemtoReg                        ),
+	.o_Branch          (Branch                              ), // Guarda AND
+	.o_MemRead         (MemRead                             ), // Control
+	.o_MemWrite        (MemWrite                            )  // Control
 );
 
+// MEM
 
+Data_memory i_Data_memory (
+	.i_clk       (clk                              ),
+	.i_rst       (rst                              ),
+	.i_Address   (EXMEM_to_DataMem_to_MEMWB_Address),
+	.i_Write_data(EXMEM_to_DataMem_WriteData       ),
+	.i_MemWrite  (MemWrite                         ),
+	.i_MemRead   (MemRead                          ),
+	.o_Read_data (DataMem_to_MEMWB_ReadData        )
+);
 
+assign PCSrc = Branch & EXMEM_to_Branch_Zero;
+
+MEM_WB i_MEM_WB (
+	.clk               (clk                              ),
+	.rst               (rst                              ),
+	.i_Address         (EXMEM_to_DataMem_to_MEMWB_Address),
+	.i_Read_data       (DataMem_to_MEMWB_ReadData        ),
+	.i_MuxRegDst_result(EXMEM_to_MEMWB_Result            ),
+	.i_RegWrite        (MEM_RegWrite                     ),
+	.i_MemtoReg        (MEM_MemtoReg                     ),
+	.o_Address         (MEMWB_to_MuxMemtoReg_Address     ),
+	.o_Read_data       (MEMWB_to_MuxMemtoReg_ReadData    ),
+	.o_MuxRegDst_result(MEMWB_to_Registers_WriteRegister ),
+	.o_RegWrite        (RegWrite                         ),
+	.o_MemtoReg        (MemtoReg                         )
+);
+
+// WB
+
+Mux i_MuxMemtoReg (
+	.i_Control(MemtoReg                          ),
+	.i_Input_0(MEMWB_to_MuxMemtoReg_ReadData     ),
+	.i_Input_1(MEMWB_to_MuxMemtoReg_Address      ),
+	.o_Salida (MuxMemtoReg_to_Registers_WriteData)
+);
 
 endmodule
