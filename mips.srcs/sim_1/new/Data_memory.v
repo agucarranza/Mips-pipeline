@@ -10,7 +10,15 @@ module Data_memory (
 
 	reg [31:0] registers[0:1023];
 	reg [31:0] tmp_read         ;
-	reg [31:0] tmp_write        ;
+
+	initial begin 
+		registers[1] = 32'h0000_0001;
+		registers[2] = 32'h0000_0003;
+		registers[3] = 32'h0000_0005;
+		registers[4] = 32'h0000_0009;
+		registers[5] = 32'h0000_000F;
+		registers[6] = 32'h0000_0002;
+	end
 
 
 	always @(posedge i_clk) begin : proc_read
@@ -31,7 +39,15 @@ module Data_memory (
 
 	assign o_Read_data = tmp_read;
 
-
+	always @(posedge i_clk) begin 
+		$display("Memoria de datos");
+		$display("%h",registers[1]);
+		$display("%h",registers[2]);
+		$display("%h",registers[3]);
+		$display("%h",registers[4]);
+		$display("%h",registers[5]);
+		$display("%h",registers[6]);
+	end
 
 
 

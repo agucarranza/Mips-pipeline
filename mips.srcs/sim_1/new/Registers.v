@@ -16,6 +16,18 @@ module Registers (
 	reg [31:0] Read_data_1      ;
 	reg [31:0] Read_data_2      ;
 
+	initial begin 
+		registers[1] = 32'h2;
+		registers[2] = 32'h4;
+		registers[3] = 32'h6;
+		registers[4] = 32'h8;
+		registers[5] = 32'h1;
+		registers[6] = 32'h2;
+		registers[6] = 32'h0;
+		registers[7] = 32'h1;
+
+	end
+
 
 	always @(posedge i_clk) begin : proc_Read
 		if(i_rst) begin
@@ -36,6 +48,15 @@ module Registers (
 		end
 	end
 
+	always @(posedge i_clk) begin 
+		$display("Registros:");
+		$display("%h",registers[1]);
+		$display("%h",registers[2]);
+		$display("%h",registers[3]);
+		$display("%h",registers[4]);
+		$display("%h",registers[5]);
+		$display("%h",registers[6]);
+	end
 
 
 endmodule

@@ -15,11 +15,10 @@ module ALU (
 	localparam SET_ON_LESS_THAN = 4'b0111;
 	localparam NOR              = 4'b1100;
 
-	reg [31:0] tmp     ;
-	reg        Zero_tmp;
+	reg [31:0] tmp;
 
-
-	assign o_Zero = (o_ALU_Result == 32'b0);
+	assign o_Zero       = (o_ALU_Result == 32'b0);
+	assign o_ALU_Result = tmp;
 
 
 	always @(*) begin : proc_Operation
@@ -45,7 +44,7 @@ module ALU (
 				tmp = ~(i_Data_1 | i_Data_2);
 
 			default : tmp = 32'b0;
-			
+
 		endcase
 	end
 endmodule

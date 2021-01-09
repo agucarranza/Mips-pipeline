@@ -84,13 +84,14 @@ Mux i_MuxPCSrc (
 
 PC i_PC (
 	.i_clk    (clk                   ),
+	.i_rst    (rst),
 	.i_address(MuxPCSrc_to_PC        ),
 	.o_address(PC_to_AddPC_to_InstMem)
 );
 
 Add i_AddPC (
 	.i_Operand_0 (PC_to_AddPC_to_InstMem   ),
-	.i_Operand_1 (32'd4                    ),
+	.i_Operand_1 (32'd1                    ),
 	.o_Add_result(AddPC_to_MuxPCSrc_to_IFID)
 );
 
@@ -264,8 +265,8 @@ MEM_WB i_MEM_WB (
 
 Mux i_MuxMemtoReg (
 	.i_Control(MemtoReg                          ),
-	.i_Input_0(MEMWB_to_MuxMemtoReg_ReadData     ),
-	.i_Input_1(MEMWB_to_MuxMemtoReg_Address      ),
+	.i_Input_0(MEMWB_to_MuxMemtoReg_Address     ),
+	.i_Input_1(MEMWB_to_MuxMemtoReg_ReadData      ),
 	.o_Salida (MuxMemtoReg_to_Registers_WriteData)
 );
 

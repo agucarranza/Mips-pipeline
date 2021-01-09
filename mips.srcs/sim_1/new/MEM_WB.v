@@ -26,7 +26,12 @@ module MEM_WB (
 	reg RegWrite;
 	reg MemtoReg;
 
-	always @(posedge clk) begin : proc_registers
+	initial begin
+		RegWrite = 1'b0;
+		MemtoReg = 1'b0;
+	end
+
+	always @(negedge clk) begin : proc_registers
 		if(rst) begin
 			Address          <= 32'b0;
 			Read_data        <= 32'b0;

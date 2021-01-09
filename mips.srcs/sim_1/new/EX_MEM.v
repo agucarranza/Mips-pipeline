@@ -43,7 +43,15 @@ module EX_MEM (
 	reg MemRead ;
 	reg MemWrite;
 
-	always @(posedge clk) begin : proc_Registers
+	initial begin
+		RegWrite = 1'b0;
+		MemtoReg = 1'b0;
+		Branch   = 1'b0;
+		MemRead  = 1'b0;
+		MemWrite = 1'b0;
+	end
+
+	always @(negedge clk) begin : proc_Registers
 		if(rst) begin
 			Add_result       <= 32'b0;
 			Zero             <= 1'b0;

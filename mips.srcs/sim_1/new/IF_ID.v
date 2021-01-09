@@ -12,7 +12,7 @@ module IF_ID (
 	reg [31:0] PC_Address ;
 	reg [31:0] Instruction;
 
-	always @(posedge clk) begin : proc_Registers
+	always @(negedge clk) begin : proc_Registers
 		if(rst) begin
 			PC_Address  <= 32'b0;
 			Instruction <= 32'b0;

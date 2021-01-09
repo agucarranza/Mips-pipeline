@@ -56,7 +56,18 @@ module ID_EX (
 	reg [ 1:0] ALUOp      ;
 	reg        ALUSrc     ;
 
-	always @(posedge clk) begin : proc_Registers
+	initial begin
+		RegWrite = 1'b0;
+		MemtoReg = 1'b0;
+		Branch   = 1'b0;
+		MemRead  = 1'b0;
+		MemWrite = 1'b0;
+		RegDst   = 1'b0;
+		ALUOp    = 2'b0;
+		ALUSrc   = 1'b0;
+	end
+
+	always @(negedge clk) begin : proc_Registers
 		if(rst) begin
 			PC_Address  <= 32'b0;
 			Read_data_1 <= 32'b0;
