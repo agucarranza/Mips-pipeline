@@ -5,6 +5,7 @@ module Data_memory (
 	input  wire [31:0] i_Write_data,
 	input  wire        i_MemWrite  ,
 	input  wire        i_MemRead   ,
+	input  wire [1:0]  i_Long      ,
 	output wire [31:0] o_Read_data
 );
 
@@ -48,7 +49,7 @@ module Data_memory (
 		$display("%h",registers[5]);
 		$display("%h",registers[6]);
 	end
-
-
-
 endmodule
+
+
+// TODO: Falta resolver los tamaños!!!!!

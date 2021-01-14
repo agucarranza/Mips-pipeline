@@ -23,8 +23,8 @@ module Registers (
 		registers[4] = 32'h8;
 		registers[5] = 32'h1;
 		registers[6] = 32'h2;
-		registers[6] = 32'h0;
-		registers[7] = 32'h1;
+		registers[7] = 32'h0;
+		registers[8] = 32'h1;
 
 	end
 

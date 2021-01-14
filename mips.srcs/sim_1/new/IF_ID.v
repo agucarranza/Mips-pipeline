@@ -24,7 +24,11 @@ module IF_ID (
 
 	assign o_Instruction = Instruction;
 	assign o_PC_Address  = PC_Address;
-
-
-
 endmodule
+
+/* 
+Registros:
+
+PC_Address
+Instruction
+*/

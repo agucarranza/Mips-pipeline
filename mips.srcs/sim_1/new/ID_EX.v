@@ -12,14 +12,15 @@ module ID_EX (
 	input  wire [ 4:0] i_rd         ,
 	// WB - Control - IN
 	input  wire        i_RegWrite   ,
-	input  wire        i_MemtoReg   ,
+	input  wire [ 1:0] i_MemtoReg   ,
 	// M - Control - IN
 	input  wire        i_Branch     ,
 	input  wire        i_MemRead    ,
 	input  wire        i_MemWrite   ,
+	input  wire [ 1:0] i_Long       ,
 	// EX - Control - IN
-	input  wire        i_RegDst     ,
-	input  wire [ 1:0] i_ALUOp      ,
+	input  wire [ 1:0] i_RegDst     ,
+	input  wire [ 2:0] i_ALUOp      ,
 	input  wire        i_ALUSrc     ,
 	// Registers - OUT
 	output wire [31:0] o_PC_Address ,
@@ -30,14 +31,15 @@ module ID_EX (
 	output wire [ 4:0] o_rd         ,
 	// WB - Control - OUT
 	output wire        o_RegWrite   ,
-	output wire        o_MemtoReg   ,
+	output wire [ 1:0] o_MemtoReg   ,
 	// M - Control - OUT
 	output wire        o_Branch     ,
 	output wire        o_MemRead    ,
 	output wire        o_MemWrite   ,
+	output wire [ 1:0] o_Long       ,
 	// EX - Control - OUT
-	output wire        o_RegDst     ,
-	output wire [ 1:0] o_ALUOp      ,
+	output wire [ 1:0] o_RegDst     ,
+	output wire [ 2:0] o_ALUOp      ,
 	output wire        o_ALUSrc
 );
 
@@ -48,22 +50,24 @@ module ID_EX (
 	reg [ 4:0] rt         ;
 	reg [ 4:0] rd         ;
 	reg        RegWrite   ;
-	reg        MemtoReg   ;
+	reg [ 1:0] MemtoReg   ;
 	reg        Branch     ;
 	reg        MemRead    ;
 	reg        MemWrite   ;
-	reg        RegDst     ;
-	reg [ 1:0] ALUOp      ;
+	reg [ 1:0] Long       ;
+	reg [ 1:0] RegDst     ;
+	reg [ 2:0] ALUOp      ;
 	reg        ALUSrc     ;
 
 	initial begin
 		RegWrite = 1'b0;
-		MemtoReg = 1'b0;
+		MemtoReg = 2'b0;
 		Branch   = 1'b0;
 		MemRead  = 1'b0;
 		MemWrite = 1'b0;
-		RegDst   = 1'b0;
-		ALUOp    = 2'b0;
+		Long     = 2'b0;
+		RegDst   = 2'b0;
+		ALUOp    = 3'b0;
 		ALUSrc   = 1'b0;
 	end
 
@@ -92,6 +96,7 @@ module ID_EX (
 			Branch   <= i_Branch     ;
 			MemRead  <= i_MemRead    ;
 			MemWrite <= i_MemWrite   ;
+			Long     <= i_Long;
 
 			RegDst <= i_RegDst     ;
 			ALUOp  <= i_ALUOp      ;
@@ -112,12 +117,33 @@ module ID_EX (
 	assign o_Branch   = Branch     ;
 	assign o_MemRead  = MemRead    ;
 	assign o_MemWrite = MemWrite   ;
+	assign o_Long     = Long;
 
 	assign o_RegDst = RegDst     ;
 	assign o_ALUOp  = ALUOp      ;
 	assign o_ALUSrc = ALUSrc     ;
 
 endmodule : ID_EX
+
+/*
+Contenido:
+
+PC_Address
+Read_data_1
+Read_data_2
+Immediate
+rt
+rd
+RegWrite
+MemtoReg
+Branch
+MemRead
+MemWrite
+Long
+RegDst
+ALUOp
+ALUSrc
+*/
 
 
 
