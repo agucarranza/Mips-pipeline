@@ -17,7 +17,7 @@ module EX_MEM (
 	input  wire        i_Branch          ,
 	input  wire        i_MemRead         ,
 	input  wire        i_MemWrite        ,
-	input  wire        i_Long            ,
+	input  wire [1:0]  i_Long            ,
 	// Registers - OUT
 	output wire [31:0] o_PC_Address      ,
 	output wire [31:0] o_Add_result      ,
@@ -32,7 +32,7 @@ module EX_MEM (
 	output wire        o_Branch          ,
 	output wire        o_MemRead         ,
 	output wire        o_MemWrite        ,
-	output wire        o_Long
+	output wire [1:0]  o_Long
 );
 	// Registers
 	reg [31:0] PC_Address      ;
@@ -47,7 +47,7 @@ module EX_MEM (
 	reg Branch  ;
 	reg MemRead ;
 	reg MemWrite;
-	reg Long;
+	reg [1:0] Long;
 
 	initial begin
 		RegWrite = 1'b0;
@@ -55,7 +55,7 @@ module EX_MEM (
 		Branch   = 1'b0;
 		MemRead  = 1'b0;
 		MemWrite = 1'b0;
-		Long = 1'b0;
+		Long = 2'b0;
 	end
 
 	always @(negedge clk) begin : proc_Registers
@@ -120,4 +120,5 @@ MemtoReg
 Branch  
 MemRead 
 MemWrite
+Long
 */

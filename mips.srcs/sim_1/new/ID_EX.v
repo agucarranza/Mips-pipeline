@@ -22,6 +22,7 @@ module ID_EX (
 	input  wire [ 1:0] i_RegDst     ,
 	input  wire [ 2:0] i_ALUOp      ,
 	input  wire        i_ALUSrc     ,
+	input  wire        i_Jump       ,
 	// Registers - OUT
 	output wire [31:0] o_PC_Address ,
 	output wire [31:0] o_Read_data_1,
@@ -40,7 +41,9 @@ module ID_EX (
 	// EX - Control - OUT
 	output wire [ 1:0] o_RegDst     ,
 	output wire [ 2:0] o_ALUOp      ,
-	output wire        o_ALUSrc
+	output wire        o_ALUSrc     ,
+	output wire        o_Jump       
+
 );
 
 	reg [31:0] PC_Address ;
@@ -58,6 +61,7 @@ module ID_EX (
 	reg [ 1:0] RegDst     ;
 	reg [ 2:0] ALUOp      ;
 	reg        ALUSrc     ;
+	reg        Jump       ;
 
 	initial begin
 		RegWrite = 1'b0;
@@ -69,6 +73,7 @@ module ID_EX (
 		RegDst   = 2'b0;
 		ALUOp    = 3'b0;
 		ALUSrc   = 1'b0;
+		Jump     = 1'b0;
 	end
 
 	always @(negedge clk) begin : proc_Registers
@@ -101,6 +106,7 @@ module ID_EX (
 			RegDst <= i_RegDst     ;
 			ALUOp  <= i_ALUOp      ;
 			ALUSrc <= i_ALUSrc     ;
+			Jump   <= i_Jump       ;
 		end
 	end
 	// Registers
@@ -122,6 +128,7 @@ module ID_EX (
 	assign o_RegDst = RegDst     ;
 	assign o_ALUOp  = ALUOp      ;
 	assign o_ALUSrc = ALUSrc     ;
+	assign o_Jump   = Jump       ;
 
 endmodule : ID_EX
 
@@ -143,6 +150,7 @@ Long
 RegDst
 ALUOp
 ALUSrc
+Jump
 */
 
 
