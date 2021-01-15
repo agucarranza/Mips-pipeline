@@ -43,8 +43,8 @@ module Control (
 	localparam BNE   = 6'b000101;
 	localparam J     = 6'b000010;
 	localparam JAL   = 6'b000011;
-	localparam JR    = 6'b000000;
-	localparam JALR  = 6'b000000;
+//	localparam JR    = 6'b000000;
+//  localparam JALR  = 6'b000000;
 	localparam HLT   = 6'b111111;
 
 
@@ -383,36 +383,36 @@ module Control (
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
-			JR : begin
-				RegDst   = 2'b01;
-				ALUOp    = 3'b011;
-				ALUSrc   = 1'bX;
-				Branch   = 1'b0;
-				Branchne = 1'b0;
-				MemRead  = 1'bX;
-				MemWrite = 1'b0;
-				RegWrite = 1'b0;
-				MemtoReg = 2'bXX;
-				Jump     = 1'b0;
-				Signed   = 1'bX;
-				Long     = 2'bXX;
-				Halt     = 1'b0;
-			end
-			JALR : begin
-				RegDst   = 2'b01;
-				ALUOp    = 3'b011;
-				ALUSrc   = 1'b0;
-				Branch   = 1'b0;
-				Branchne = 1'b0;
-				MemRead  = 1'b0;
-				MemWrite = 1'b0;
-				RegWrite = 1'b1;
-				MemtoReg = 2'b00;
-				Jump     = 1'b0;
-				Signed   = 1'bX;
-				Long     = 2'bXX;
-				Halt     = 1'b0;
-			end
+			// JR : begin
+			// 	RegDst   = 2'b01;
+			// 	ALUOp    = 3'b011;
+			// 	ALUSrc   = 1'bX;
+			// 	Branch   = 1'b0;
+			// 	Branchne = 1'b0;
+			// 	MemRead  = 1'bX;
+			// 	MemWrite = 1'b0;
+			// 	RegWrite = 1'b0;
+			// 	MemtoReg = 2'bXX;
+			// 	Jump     = 1'b0;
+			// 	Signed   = 1'bX;
+			// 	Long     = 2'bXX;
+			// 	Halt     = 1'b0;
+			// end
+			// JALR : begin
+			// 	RegDst   = 2'b01;
+			// 	ALUOp    = 3'b011;
+			// 	ALUSrc   = 1'b0;
+			// 	Branch   = 1'b0;
+			// 	Branchne = 1'b0;
+			// 	MemRead  = 1'b0;
+			// 	MemWrite = 1'b0;
+			// 	RegWrite = 1'b1;
+			// 	MemtoReg = 2'b00;
+			// 	Jump     = 1'b0;
+			// 	Signed   = 1'bX;
+			// 	Long     = 2'bXX;
+			// 	Halt     = 1'b0;
+			// end
 
 			HLT : begin
 				RegDst   = 2'bXX;

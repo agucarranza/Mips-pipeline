@@ -8,33 +8,33 @@ module ALU_control (
 
 	reg [3:0] Operation;
 
-	localparam F_SLL  = 9'b011_000000;
-	localparam F_SRL  = 9'b011_000010;
-	localparam F_SRA  = 9'b011_000011;
-	localparam F_SLLV = 9'b011_000100;
-	localparam F_SRLV = 9'b011_000110;
-	localparam F_SRAV = 9'b011_000111;
-	localparam F_ADDU = 9'b011_100001;
-	localparam F_SUBU = 9'b011_100011;
-	localparam F_AND  = 9'b011_100100;
-	localparam F_OR   = 9'b011_100101;
-	localparam F_XOR  = 9'b011_100110;
-	localparam F_NOR  = 9'b011_100111;
-	localparam F_SLT  = 9'b011_101010;
-	localparam F_LOADS= 9'b000_??????;
-	//localparam F_ADDI = 9'b000_??????;
-	localparam F_ANDI = 9'b100_??????;
-	localparam F_ORI  = 9'b101_??????;
-	localparam F_XORI = 9'b110_??????;
-	localparam F_LUI  = 9'b111_??????;
-	localparam F_SLTI = 9'b010_??????;
-	localparam F_BEQ  = 9'b001_??????;
-	//localparam F_BNE  = 9'b001_??????;
-	//localparam F_J    = 9'b???_??????;
-	//localparam F_JAL  = 9'b???_??????;
-	//localparam F_JR   = 9'b???_??????;
-	localparam F_JALR = 9'b011_??????;
-	//localparam F_HLT  = 9'b???_??????;
+	localparam F_SLL   = 9'b011_000000;
+	localparam F_SRL   = 9'b011_000010;
+	localparam F_SRA   = 9'b011_000011;
+	localparam F_SLLV  = 9'b011_000100;
+	localparam F_SRLV  = 9'b011_000110;
+	localparam F_SRAV  = 9'b011_000111;
+	localparam F_ADDU  = 9'b011_100001;
+	localparam F_SUBU  = 9'b011_100011;
+	localparam F_AND   = 9'b011_100100;
+	localparam F_OR    = 9'b011_100101;
+	localparam F_XOR   = 9'b011_100110;
+	localparam F_NOR   = 9'b011_100111;
+	localparam F_SLT   = 9'b011_101010;
+	localparam F_LOADS = 9'b000_??????;
+  //localparam F_ADDI  = 9'b000_??????;
+	localparam F_ANDI  = 9'b100_??????;
+	localparam F_ORI   = 9'b101_??????;
+	localparam F_XORI  = 9'b110_??????;
+	localparam F_LUI   = 9'b111_??????;
+	localparam F_SLTI  = 9'b010_??????;
+	localparam F_BEQ   = 9'b001_??????;
+  //localparam F_BNE   = 9'b001_??????;
+  //localparam F_J     = 9'b???_??????;
+  //localparam F_JAL   = 9'b???_??????;
+  //localparam F_JR    = 9'b???_??????;
+  //localparam F_JALR  = 9'b011_??????;
+  //localparam F_HLT   = 9'b???_??????;
 
 	localparam OUT_SLL  = 4'b0000;
 	localparam OUT_SRL  = 4'b0001;
@@ -70,19 +70,19 @@ module ALU_control (
 
 			F_LOADS : Operation = OUT_ADDU;
 
-//F_ADDI : Operation = OUT_ADDU;
-F_ANDI : Operation = OUT_AND;
-F_ORI  : Operation = OUT_OR;
-F_XORI : Operation = OUT_XOR;
-F_LUI  : Operation = OUT_ADDU;
-F_SLTI : Operation = OUT_SLT;
-F_BEQ  : Operation = OUT_SUBU;
-//F_BNE  : Operation = OUT_ADDU;
-//F_J    : Operation = OUT_ADDU;
-//F_JAL  : Operation = OUT_ADDU;
-//F_JR   : Operation = OUT_ADDU;
-//F_JALR : Operation = OUT_ADDU;
-//F_HLT: Operation = OUT_ADDU;
+		  //F_ADDI : Operation = OUT_ADDU;
+			F_ANDI : Operation = OUT_AND;
+			F_ORI  : Operation = OUT_OR;
+			F_XORI : Operation = OUT_XOR;
+			F_LUI  : Operation = OUT_ADDU;
+			F_SLTI : Operation = OUT_SLT;
+			F_BEQ  : Operation = OUT_SUBU;
+		  //F_BNE  : Operation = OUT_ADDU;
+		  //F_J    : Operation = OUT_ADDU;
+		  //F_JAL  : Operation = OUT_ADDU;
+		  //F_JR   : Operation = OUT_ADDU;
+		  //F_JALR : Operation = OUT_ADDU;
+		  //F_HLT  : Operation = OUT_ADDU;
 
 			default : Operation = 4'b0000;
 		endcase

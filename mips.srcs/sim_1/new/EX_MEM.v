@@ -14,7 +14,6 @@ module EX_MEM (
 	input  wire        i_RegWrite        ,
 	input  wire [1:0]  i_MemtoReg        ,
 	// M - Control - IN
-	input  wire        i_Branch          ,
 	input  wire        i_MemRead         ,
 	input  wire        i_MemWrite        ,
 	input  wire [1:0]  i_Long            ,
@@ -29,7 +28,6 @@ module EX_MEM (
 	output wire        o_RegWrite        ,
 	output wire [1:0]  o_MemtoReg        ,
 	// M - Control - OUT
-	output wire        o_Branch          ,
 	output wire        o_MemRead         ,
 	output wire        o_MemWrite        ,
 	output wire [1:0]  o_Long
@@ -44,7 +42,6 @@ module EX_MEM (
 	// Control
 	reg RegWrite;
 	reg [1:0]  MemtoReg;
-	reg Branch  ;
 	reg MemRead ;
 	reg MemWrite;
 	reg [1:0] Long;
@@ -52,7 +49,6 @@ module EX_MEM (
 	initial begin
 		RegWrite = 1'b0;
 		MemtoReg = 2'b0;
-		Branch   = 1'b0;
 		MemRead  = 1'b0;
 		MemWrite = 1'b0;
 		Long = 2'b0;
@@ -79,7 +75,6 @@ module EX_MEM (
 			RegWrite         <= i_RegWrite   ;
 			MemtoReg         <= i_MemtoReg   ;
 
-			Branch   <= i_Branch     ;
 			MemRead  <= i_MemRead    ;
 			MemWrite <= i_MemWrite   ;
 			Long     <= i_Long;
@@ -98,7 +93,6 @@ module EX_MEM (
 	assign o_RegWrite = RegWrite   ;
 	assign o_MemtoReg = MemtoReg   ;
 
-	assign o_Branch   = Branch     ;
 	assign o_MemRead  = MemRead    ;
 	assign o_MemWrite = MemWrite   ;
 	assign o_Long = Long;
@@ -117,7 +111,6 @@ MuxRegDst_result
 
 RegWrite
 MemtoReg
-Branch  
 MemRead 
 MemWrite
 Long

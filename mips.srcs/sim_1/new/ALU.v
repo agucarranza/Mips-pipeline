@@ -33,19 +33,19 @@ module ALU (
 
 		case (i_Control)
 
-			SLL  : ALU_register = i_Data_2 << i_Shamt;
-			SRL  : ALU_register = i_Data_2 >> i_Shamt;
-			SRA  : ALU_register = i_Data_2 <<< i_Shamt;
-			SLLV : ALU_register = i_Data_2 << i_Data_1[4:0];
-			SRLV : ALU_register = i_Data_2 >> i_Data_1[4:0];
-			SRAV : ALU_register = i_Data_2 >>> i_Data_1[4:0];
-			ADDU : ALU_register = i_Data_1 + i_Data_2;
-			SUBU : ALU_register = i_Data_1 - i_Data_2;
-			AND  : ALU_register = i_Data_1 & i_Data_2;
-			OR   : ALU_register = i_Data_1 | i_Data_2;
-			XOR  : ALU_register = i_Data_1 ^ i_Data_2;
-			NOR  : ALU_register = ~(i_Data_1 | i_Data_2);
-			SLT  : ALU_register = i_Data_1 < i_Data_2 ? 32'b1 : 32'b0;
+			SLL  : ALU_register =   i_Data_2 <<  i_Shamt;
+			SRL  : ALU_register =   i_Data_2 >>  i_Shamt;
+			SRA  : ALU_register =   i_Data_2 <<< i_Shamt;
+			SLLV : ALU_register =   i_Data_2 <<  i_Data_1[4:0];
+			SRLV : ALU_register =   i_Data_2 >>  i_Data_1[4:0];
+			SRAV : ALU_register =   i_Data_2 >>> i_Data_1[4:0];
+			ADDU : ALU_register =   i_Data_1  +  i_Data_2;
+			SUBU : ALU_register =   i_Data_1  -  i_Data_2;
+			AND  : ALU_register =   i_Data_1  &  i_Data_2;
+			OR   : ALU_register =   i_Data_1  |  i_Data_2;
+			XOR  : ALU_register =   i_Data_1  ^  i_Data_2;
+			NOR  : ALU_register = ~(i_Data_1  |  i_Data_2);
+			SLT  : ALU_register =   i_Data_1  <  i_Data_2 ? 32'b1 : 32'b0;
 
 			default : ALU_register = 32'b0;
 

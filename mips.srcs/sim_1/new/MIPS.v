@@ -19,8 +19,6 @@ wire [2:0] ALUOp      ;
 wire       MemWrite   ;
 wire       MemRead    ;
 wire [1:0] MemtoReg   ;
-wire       Branch     ;
-wire       Branchne   ;
 
 wire       SignZero ;
 wire       Jump     ;
@@ -32,12 +30,12 @@ wire [2:0] ID_ALUOp    ;
 wire       ID_ALUSrc   ;
 wire       ID_Jump     ;
 wire       ID_Branch   ;
+wire       ID_Branchne   ;
 wire       ID_MemRead  ;
 wire       ID_MemWrite ;
 wire       ID_RegWrite ;
 wire [1:0] ID_MemtoReg ;
 wire [1:0] ID_Long     ;
-wire       EX_Branch   ;
 wire       EX_MemRead  ;
 wire       EX_MemWrite ;
 wire       EX_RegWrite ;
@@ -171,7 +169,7 @@ Control i_Control (
 	.o_ALUOp   (ID_ALUOp          ),
 	.o_ALUSrc  (ID_ALUSrc         ),
 	.o_Branch  (ID_Branch         ),
-	.o_Branchne(Branchne          ),
+	.o_Branchne(ID_Branchne          ),
 	.o_MemRead (ID_MemRead        ),
 	.o_MemWrite(ID_MemWrite       ),
 	.o_RegWrite(ID_RegWrite       ),
@@ -181,6 +179,9 @@ Control i_Control (
 	.o_Long    (ID_Long           ),
 	.o_Halt    (Halt              )
 );
+
+wire ID_Branch_Branchne = ( (ID_Branch & Comparador) | (ID_Branchne & ~Comparador) );
+
 
 // Signo o Cero extension ?
 Mux i_Mux_Sign_Zero (
@@ -197,12 +198,12 @@ ID_EX i_ID_EX (
 	.i_PC_Address (IFID_to_IDEX_PC_Address                         ),
 	.i_Read_data_1(Registers_to_IDEX_ReadData1                     ),
 	.i_Read_data_2(Registers_to_IDEX_ReadData2                     ),
-	.i_Immediate  (MuxSignZero_to_IDEX_Immediate                   ), // Sign extension
+	.i_Immediate  (MuxSignZero_to_IDEX_Immediate                   ), // Sign extension con el mux
 	.i_rt         (Instruction[20:16]                              ),
 	.i_rd         (Instruction[15:11]                              ),
 	.i_RegWrite   (ID_RegWrite                                     ),
 	.i_MemtoReg   (ID_MemtoReg                                     ),
-	.i_Branch     (ID_Branch                                       ),
+	.i_Branch     (ID_Branch_Branchne                              ),
 	.i_MemRead    (ID_MemRead                                      ),
 	.i_MemWrite   (ID_MemWrite                                     ),
 	.i_Long       (ID_Long                                         ),
@@ -218,7 +219,7 @@ ID_EX i_ID_EX (
 	.o_rd         (IDEX_to_MuxRegDst_rd_1                          ),
 	.o_RegWrite   (EX_RegWrite                                     ),
 	.o_MemtoReg   (EX_MemtoReg                                     ),
-	.o_Branch     (EX_Branch                                       ),
+	.o_Branch     (PCSrcBranch                                     ), // Aca capaz que sale el branch
 	.o_MemRead    (EX_MemRead                                      ),
 	.o_MemWrite   (EX_MemWrite                                     ),
 	.o_Long       (EX_Long                                         ),
@@ -283,7 +284,6 @@ EX_MEM i_EX_MEM (
 	.i_MuxRegDst_result(MuxRegDst_to_EXMEM_Result           ),
 	.i_RegWrite        (EX_RegWrite                         ),
 	.i_MemtoReg        (EX_MemtoReg                         ),
-	.i_Branch          (EX_Branch                           ),
 	.i_MemRead         (EX_MemRead                          ),
 	.i_MemWrite        (EX_MemWrite                         ),
 	.i_Long            (EX_Long                             ),
@@ -295,11 +295,12 @@ EX_MEM i_EX_MEM (
 	.o_MuxRegDst_result(EXMEM_to_MEMWB_Result               ), // MuxRegDst -> Result
 	.o_RegWrite        (MEM_RegWrite                        ),
 	.o_MemtoReg        (MEM_MemtoReg                        ),
-	.o_Branch          (Branch                              ), // Guarda AND
 	.o_MemRead         (MemRead                             ), // Control
 	.o_MemWrite        (MemWrite                            ), // Control
 	.o_Long            (Long                                )
 );
+
+//Capaz que haya que sacar el Branch de este registro
 
 // MEM
 
@@ -314,7 +315,7 @@ Data_memory i_Data_memory (
 	.o_Read_data (DataMem_to_MEMWB_ReadData           )
 );
 
-assign PCSrcBranch = Branch & EXMEM_to_Branch_Zero;
+//assign PCSrcBranch = Branch & EXMEM_to_Branch_Zero;
 
 MEM_WB i_MEM_WB (
 	.clk               (clk                                 ),
