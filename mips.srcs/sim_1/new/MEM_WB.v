@@ -30,30 +30,32 @@ module MEM_WB (
 	reg [1:0] MemtoReg;
 
 	initial begin
-		RegWrite = 1'b0;
-		MemtoReg = 2'b0;
 	end
 
 	always @(negedge clk) begin : proc_registers
 		if(rst) begin
+			RegWrite         <= 1'b0 ;
+			MemtoReg         <= 2'b0 ;
+
 			PC_Address       <= 32'b0;
-			ALUAddress       <= 32'b0;
 			Read_data        <= 32'b0;
-			MuxRegDst_result <= 5'b0;
+			ALUAddress       <= 32'b0;
+			MuxRegDst_result <= 5'b0 ;
 		end else begin
-			PC_Address       <= i_ALUAddress;
-			ALUAddress       <= i_ALUAddress;
-			Read_data        <= i_Read_data;
+			RegWrite <= i_RegWrite;
+			MemtoReg <= i_MemtoReg;
+
+			PC_Address       <= i_ALUAddress      ;
+			Read_data        <= i_Read_data       ;
+			ALUAddress       <= i_ALUAddress      ;
 			MuxRegDst_result <= i_MuxRegDst_result;
 
-			RegWrite <= i_RegWrite   ;
-			MemtoReg <= i_MemtoReg   ;
 		end
 	end
 	// Registers
 	assign o_PC_Address       = PC_Address  ;
-	assign o_ALUAddress       = ALUAddress  ;
 	assign o_Read_data        = Read_data;
+	assign o_ALUAddress       = ALUAddress  ;
 	assign o_MuxRegDst_result = MuxRegDst_result;
 	// Control
 	assign o_RegWrite = RegWrite   ;
@@ -61,3 +63,14 @@ module MEM_WB (
 
 endmodule : MEM_WB
 
+/*
+Señales:
+
+RegWrite
+MemtoReg
+
+PC_Address      
+ALUAddress      
+Read_data       
+MuxRegDst_result
+*/

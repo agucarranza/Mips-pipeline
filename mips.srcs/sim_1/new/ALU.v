@@ -22,6 +22,8 @@ module ALU (
 	localparam XOR  = 4'b1010;
 	localparam NOR  = 4'b1011;
 	localparam SLT  = 4'b1100;
+	localparam JALR = 4'b1101;
+	localparam LUI  = 4'b1110;
 
 	reg [31:0] ALU_register;
 
@@ -35,7 +37,7 @@ module ALU (
 
 			SLL  : ALU_register =   i_Data_2 <<  i_Shamt;
 			SRL  : ALU_register =   i_Data_2 >>  i_Shamt;
-			SRA  : ALU_register =   i_Data_2 <<< i_Shamt;
+			SRA  : ALU_register =   i_Data_2 >>> i_Shamt;
 			SLLV : ALU_register =   i_Data_2 <<  i_Data_1[4:0];
 			SRLV : ALU_register =   i_Data_2 >>  i_Data_1[4:0];
 			SRAV : ALU_register =   i_Data_2 >>> i_Data_1[4:0];
@@ -46,6 +48,8 @@ module ALU (
 			XOR  : ALU_register =   i_Data_1  ^  i_Data_2;
 			NOR  : ALU_register = ~(i_Data_1  |  i_Data_2);
 			SLT  : ALU_register =   i_Data_1  <  i_Data_2 ? 32'b1 : 32'b0;
+			JALR : ALU_register =   i_Data_1  +  1'b1;
+			LUI  : ALU_register =   i_Data_2 <<  16;
 
 			default : ALU_register = 32'b0;
 

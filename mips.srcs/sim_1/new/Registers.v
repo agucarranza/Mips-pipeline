@@ -43,7 +43,7 @@ module Registers (
 	assign o_Read_data_2 = Read_data_2;
 
 	always @(posedge i_clk) begin : proc_Write
-		if(i_RegWrite) begin
+		if(i_RegWrite && |i_Write_register) begin
 			registers[i_Write_register] <= i_Write_data;
 		end
 	end

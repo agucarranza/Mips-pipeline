@@ -3,22 +3,23 @@
 module Control (
 	// INPUT
 	input  wire [5:0] i_Op      ,
+	// WB
+	output wire       o_RegWrite,
+	output wire [1:0] o_MemtoReg,
+	// MEM
+	output wire       o_MemRead ,
+	output wire       o_MemWrite,
+	output wire [1:0] o_Long    ,
 	// EX
 	output wire [1:0] o_RegDst  ,
 	output wire [2:0] o_ALUOp   ,
 	output wire       o_ALUSrc  ,
-	// MEM
+	// ID
+	output wire       o_Signed  ,
+	// IF
 	output wire       o_Branch  ,
 	output wire       o_Branchne,
-	output wire       o_MemRead ,
-	output wire       o_MemWrite,
-	// WB
-	output wire       o_RegWrite,
-	output wire [1:0] o_MemtoReg,
-	// Saltos
 	output wire       o_Jump    ,
-	output wire       o_Signed  ,
-	output wire [1:0] o_Long    ,
 	output wire       o_Halt
 );
 
@@ -43,8 +44,6 @@ module Control (
 	localparam BNE   = 6'b000101;
 	localparam J     = 6'b000010;
 	localparam JAL   = 6'b000011;
-//	localparam JR    = 6'b000000;
-//  localparam JALR  = 6'b000000;
 	localparam HLT   = 6'b111111;
 
 
@@ -383,36 +382,6 @@ module Control (
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
-			// JR : begin
-			// 	RegDst   = 2'b01;
-			// 	ALUOp    = 3'b011;
-			// 	ALUSrc   = 1'bX;
-			// 	Branch   = 1'b0;
-			// 	Branchne = 1'b0;
-			// 	MemRead  = 1'bX;
-			// 	MemWrite = 1'b0;
-			// 	RegWrite = 1'b0;
-			// 	MemtoReg = 2'bXX;
-			// 	Jump     = 1'b0;
-			// 	Signed   = 1'bX;
-			// 	Long     = 2'bXX;
-			// 	Halt     = 1'b0;
-			// end
-			// JALR : begin
-			// 	RegDst   = 2'b01;
-			// 	ALUOp    = 3'b011;
-			// 	ALUSrc   = 1'b0;
-			// 	Branch   = 1'b0;
-			// 	Branchne = 1'b0;
-			// 	MemRead  = 1'b0;
-			// 	MemWrite = 1'b0;
-			// 	RegWrite = 1'b1;
-			// 	MemtoReg = 2'b00;
-			// 	Jump     = 1'b0;
-			// 	Signed   = 1'bX;
-			// 	Long     = 2'bXX;
-			// 	Halt     = 1'b0;
-			// end
 
 			HLT : begin
 				RegDst   = 2'bXX;
@@ -450,17 +419,18 @@ module Control (
 
 	end
 
-	assign o_RegDst   = RegDst;
+	assign o_RegDst   = RegDst  ;
 	assign o_ALUOp    = ALUOp   ;
 	assign o_ALUSrc   = ALUSrc  ;
 	assign o_Branch   = Branch  ;
+	assign o_Branchne = Branchne;
 	assign o_MemRead  = MemRead ;
 	assign o_MemWrite = MemWrite;
 	assign o_RegWrite = RegWrite;
 	assign o_MemtoReg = MemtoReg;
-	assign o_Jump     = Jump  ;
-	assign o_Signed   = Signed;
-	assign o_Long     = Long  ;
-	assign o_Halt     = Halt  ;
+	assign o_Jump     = Jump    ;
+	assign o_Signed   = Signed  ;
+	assign o_Long     = Long    ;
+	assign o_Halt     = Halt    ;
 
 endmodule
