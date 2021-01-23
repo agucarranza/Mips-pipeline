@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module JR_Control (
 	input  wire [2:0] i_AluOp        ,
 	input  wire [5:0] i_Function_code,

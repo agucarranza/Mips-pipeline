@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "MIPS.v"
+//`include "MIPS.v"
 
 module tb_mips;
 
