@@ -11,7 +11,7 @@ initial begin
 	clk = 1'b1;
 
 /* verilator lint_off STMTDLY */	
-	#40
+	#60
 /* verilator lint_on STMTDLY */
 		rst = 1'b0;
 end

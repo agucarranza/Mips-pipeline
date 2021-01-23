@@ -9,7 +9,7 @@ module Data_memory (
 	output wire [31:0] o_Read_data
 );
 
-	reg [31:0] registers[1023:0];
+	reg [31:0] registers[0:1023];
 	reg [31:0] tmp_read         ;
 	reg [31:0] tmp_write        ;
 
@@ -30,35 +30,34 @@ module Data_memory (
 		end else begin
 			if (i_MemRead) begin : read_flag
 				tmp_read <= registers[i_Address];
-				case(i_Long)
-					2'b00 : tmp_read <= { 24'b0 ,tmp_read[ 7:0] };
-					2'b01 : tmp_read <= { 16'b0 ,tmp_read[15:0] };
-					2'b11 : tmp_read <= tmp_read;
-
-					default : tmp_read <= tmp_read;
-				endcase // i_Long
 			end
 		end
 	end
 
-	always @(posedge i_clk) begin : proc_
+	assign o_Read_data = (i_Long == 2'b00) ? { {24{tmp_read[7]}} ,tmp_read[ 7:0] } :
+						 (i_Long == 2'b01) ? { {16{tmp_read[7]}} ,tmp_read[15:0] } :
+						 tmp_read;
+
+
+	wire [31:0] writing_reg = registers[i_Address]                    ;
+	wire [31:0] v_byte      = { writing_reg[31:8], i_Write_data[7:0] };
+	wire [31:0] v_hw        = {writing_reg[31:16], i_Write_data[15:0]};
+
+
+	always @(posedge i_clk) begin : proc_write
 		if(i_MemWrite) begin
 
-			tmp_write <= registers[i_Address];
 			case (i_Long)
 
-				2'b00 : tmp_write <= { tmp_write[31:8], i_Write_data[7:0] };
-				2'b01 : tmp_write <= { tmp_write[31:16], i_Write_data[15:0] };
-				2'b11 : tmp_write <= i_Write_data;
+				2'b00 : registers[i_Address] <= v_byte;
+				2'b01 : registers[i_Address] <= v_hw;
+				2'b11 : registers[i_Address] <= i_Write_data;
 
-				default : tmp_write <= i_Write_data;
+				default : registers[i_Address] <= i_Write_data;
 			endcase
-
-			registers[i_Address] <= tmp_write;
 		end
 	end
 
-	assign o_Read_data = tmp_read;
 
 	always @(posedge i_clk) begin
 		$display("Memoria de datos");

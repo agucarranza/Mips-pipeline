@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
-//`include "Mux.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
-//`include "Registers.v" `include "Control.v" `include "ID_EX.v"
-//`include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
-//`include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v"
+// `include "Mux.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
+// `include "Registers.v" `include "Control.v" `include "ID_EX.v"
+// `include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
+// `include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v"
 
 module MIPS
 	(
@@ -29,7 +29,6 @@ wire [1:0] Long     ;
 wire [1:0] ID_RegDst      ;
 wire [2:0] ID_ALUOp       ;
 wire       ID_ALUSrc      ;
-wire       ID_Jump        ;
 wire       ID_Branch      ;
 wire       ID_Branchne    ;
 wire       ID_MemRead     ;
@@ -75,7 +74,6 @@ wire [ 4:0] IDEX_to_MuxRegDst_rt_0                          ;
 wire [ 4:0] IDEX_to_MuxRegDst_rd_1                          ;
 wire [31:0] IDEX_to_ALUControl_to_Add_to_MuxALUSrc_Immediate;
 wire [31:0] MuxALUSrc_to_ALU_Operand2                       ;
-wire        ALU_to_EXMEM_Zero                               ;
 wire [ 3:0] ALUControl_to_ALU_Operation                     ;
 wire [31:0] ALU_to_EXMEM_ALUResult                          ;
 wire [ 4:0] MuxRegDst_to_EXMEM_Result                       ;
@@ -172,7 +170,7 @@ Control i_Control (
 	.o_MemWrite(ID_MemWrite       ),
 	.o_RegWrite(ID_RegWrite       ),
 	.o_MemtoReg(ID_MemtoReg       ),
-	.o_Jump    (ID_Jump           ),
+	.o_Jump    (Jump              ),
 	.o_Signed  (SignZero          ),
 	.o_Long    (ID_Long           ),
 	.o_Halt    (Halt              )
@@ -258,7 +256,6 @@ ALU i_ALU (
 	.i_Data_1    (MuxJALR_to_ALU_Operand1                               ),
 	.i_Data_2    (MuxALUSrc_to_ALU_Operand2                             ),
 	.i_Shamt     (IDEX_to_ALUControl_to_Add_to_MuxALUSrc_Immediate[10:6]),
-	.o_Zero      (ALU_to_EXMEM_Zero                                     ),
 	.o_ALU_Result(ALU_to_EXMEM_ALUResult                                )
 );
 

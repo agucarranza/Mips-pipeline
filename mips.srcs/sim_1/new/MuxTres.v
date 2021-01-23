@@ -19,4 +19,7 @@ module MuxTres #(parameter BUS_SIZE = 32) (
 				registro = i_Input_0;
 		endcase
 	end
+
+	assign o_Salida = registro;
+	
 endmodule

@@ -36,4 +36,7 @@ module JR_Control (
 
 	end
 
+	assign o_JR_Control   = JR_Control;
+	assign o_JALR_Control = JALR_Control;
+
 endmodule

@@ -12,7 +12,7 @@ module Instruction_memory (
 
 	initial begin
 		// Relleno del Pipeline
-		memory[0] = 32'h8c23_0000;
+		memory[0] = 32'h00e7_3824;
 		memory[1] = 32'h00e7_3824;
 		memory[2] = 32'h00e7_3824;
 		memory[3] = 32'h00e7_3824;
@@ -20,21 +20,21 @@ module Instruction_memory (
 		memory[5] = 32'h00e7_3824;
 
      // memory[6] = 32'h8c23_0000; // lw 	OK!
-	 //	memory[6] = 32'hac23_0000; // sw 	OK!
+	 	memory[6] = 32'hac23_0000; // sw 	OK!
 	 //	memory[6] = 32'h0043_0820; // add 	OK!
-		memory[6] = 32'h1026_0006; // beq --+
+	 //	memory[6] = 32'h1026_0006; // beq --+
 								    //		\
 								    //		\
 		memory[7]  = 32'h00e7_3824; //		\
 		memory[8]  = 32'h00e7_3824; //		\			
-		memory[9]  = 32'h8c23_0009; // <----+
-		memory[10] = 32'h8c23_0000; // <<---
-		memory[11] = 32'h8c23_0001;
-		memory[12] = 32'h8c23_0003;
-		memory[13] = 32'h8c23_0004;
-		memory[14] = 32'h8c23_0005;
-		memory[15] = 32'h8c23_0006;
-		memory[16] = 32'h8c23_0007;
+		memory[9]  = 32'h00e7_3824; // <----+
+		memory[10] = 32'h00e7_3824; // <<---
+		memory[11] = 32'h00e7_3824;
+		memory[12] = 32'h00e7_3824;
+		memory[13] = 32'h00e7_3824;
+		memory[14] = 32'h00e7_3824;
+		memory[15] = 32'h00e7_3824;
+		memory[16] = 32'h00e7_3824;
 		memory[17] = 32'h00e7_3824;
 	end
 

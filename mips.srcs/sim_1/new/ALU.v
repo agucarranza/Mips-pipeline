@@ -5,7 +5,6 @@ module ALU (
 	input  wire [31:0] i_Data_1    , // [25:21] rs
 	input  wire [31:0] i_Data_2    , // [20:16] rt
 	input  wire [ 4:0] i_Shamt     , // [10:06] shamt
-	output wire        o_Zero      ,
 	output wire [31:0] o_ALU_Result
 );
 
@@ -27,7 +26,6 @@ module ALU (
 
 	reg [31:0] ALU_register;
 
-	assign o_Zero       = (o_ALU_Result == 32'b0);
 	assign o_ALU_Result = ALU_register;
 
 
