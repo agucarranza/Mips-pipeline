@@ -17,6 +17,7 @@ module ID_EX (
 	input  wire        i_MemRead    ,
 	input  wire        i_MemWrite   ,
 	input  wire [ 1:0] i_Long       ,
+	input  wire        i_MemSign    ,
 	// EX - Control - IN
 	input  wire [ 1:0] i_RegDst     ,
 	input  wire [ 2:0] i_ALUOp      ,
@@ -36,6 +37,7 @@ module ID_EX (
 	output wire        o_MemRead    ,
 	output wire        o_MemWrite   ,
 	output wire [ 1:0] o_Long       ,
+	output wire        o_MemSign    ,
 	// EX - Control - OUT
 	output wire [ 1:0] o_RegDst     ,
 	output wire [ 2:0] o_ALUOp      ,
@@ -55,6 +57,7 @@ module ID_EX (
 	reg       MemRead ;
 	reg       MemWrite;
 	reg [1:0] Long    ;
+	reg       MemSign ;
 	reg [1:0] RegDst  ;
 	reg [2:0] ALUOp   ;
 	reg       ALUSrc  ;
@@ -77,6 +80,7 @@ module ID_EX (
 			MemRead  <= 1'b0;
 			MemWrite <= 1'b0;
 			Long     <= 2'b0;
+			MemSign  <= 1'b0;
 			RegDst   <= 2'b0;
 			ALUOp    <= 3'b0;
 			ALUSrc   <= 1'b0;
@@ -97,7 +101,8 @@ module ID_EX (
 
 			MemRead  <= i_MemRead    ;
 			MemWrite <= i_MemWrite   ;
-			Long     <= i_Long;
+			Long     <= i_Long       ;
+			MemSign  <= i_MemSign    ;
 
 			RegDst   <= i_RegDst     ;
 			ALUOp    <= i_ALUOp      ;
@@ -119,7 +124,8 @@ module ID_EX (
 
 	assign o_MemRead  = MemRead    ;
 	assign o_MemWrite = MemWrite   ;
-	assign o_Long     = Long;
+	assign o_Long     = Long       ;
+	assign o_MemSign  = MemSign    ;
 
 	assign o_RegDst   = RegDst     ;
 	assign o_ALUOp    = ALUOp      ;
@@ -143,6 +149,7 @@ MemtoReg
 MemRead
 MemWrite
 Long
+MemSign
 RegDst
 ALUOp
 ALUSrc

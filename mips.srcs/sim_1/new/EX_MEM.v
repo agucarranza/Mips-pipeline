@@ -15,6 +15,7 @@ module EX_MEM (
 	input  wire        i_MemRead         ,
 	input  wire        i_MemWrite        ,
 	input  wire [ 1:0] i_Long            ,
+	input  wire        i_MemSign         ,
 	// Registers - OUT
 	output wire [31:0] o_PC_Address      ,
 	output wire [31:0] o_ALU_result      ,
@@ -26,7 +27,8 @@ module EX_MEM (
 	// M - Control - OUT
 	output wire        o_MemRead         ,
 	output wire        o_MemWrite        ,
-	output wire [ 1:0] o_Long
+	output wire [ 1:0] o_Long            ,
+	output wire        o_MemSign
 );
 	// Registers
 	reg [31:0] PC_Address      ;
@@ -39,6 +41,7 @@ module EX_MEM (
 	reg       MemRead ;
 	reg       MemWrite;
 	reg [1:0] Long    ;
+	reg       MemSign ;
 
 	initial begin
 		RegWrite = 1'b0;
@@ -46,6 +49,7 @@ module EX_MEM (
 		MemRead  = 1'b0;
 		MemWrite = 1'b0;
 		Long     = 2'b0;
+		MemSign  = 1'b0;
 	end
 
 	always @(negedge clk) begin : proc_Registers
@@ -68,6 +72,7 @@ module EX_MEM (
 			MemRead  <= i_MemRead  ;
 			MemWrite <= i_MemWrite ;
 			Long     <= i_Long     ;
+			MemSign  <= i_MemSign  ;
 		end
 	end
 
@@ -83,7 +88,8 @@ module EX_MEM (
 
 	assign o_MemRead  = MemRead    ;
 	assign o_MemWrite = MemWrite   ;
-	assign o_Long     = Long;
+	assign o_Long     = Long       ;
+	assign o_MemSign  = MemSign    ;
 
 endmodule : EX_MEM
 
@@ -100,4 +106,5 @@ MemtoReg
 MemRead
 MemWrite
 Long
+MemSign
 */

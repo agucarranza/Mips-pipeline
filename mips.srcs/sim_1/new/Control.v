@@ -10,6 +10,7 @@ module Control (
 	output wire       o_MemRead ,
 	output wire       o_MemWrite,
 	output wire [1:0] o_Long    ,
+	output wire       o_MemSign ,
 	// EX
 	output wire [1:0] o_RegDst  ,
 	output wire [2:0] o_ALUOp   ,
@@ -58,8 +59,9 @@ module Control (
 	reg       RegWrite;
 	reg [1:0] MemtoReg;
 	reg       Jump    ;
-	reg       Signed  ;
+	reg       MemSign ;
 	reg [1:0] Long    ;
+	reg       Signed  ;
 	reg       Halt    ;
 
 
@@ -68,6 +70,7 @@ module Control (
 		case(i_Op)
 
 			RTYPE : begin
+				Signed   = 1'bX  ;
 				RegDst   = 2'b01 ;
 				ALUOp    = 3'b011;
 				ALUSrc   = 1'b0	 ;
@@ -78,12 +81,13 @@ module Control (
 				RegWrite = 1'b1	 ;
 				MemtoReg = 2'b00 ;
 				Jump     = 1'b0	 ;
-				Signed   = 1'bX	 ;
+				MemSign  = 1'bX	 ;
 				Long     = 2'bXX ;
 				Halt     = 1'b0  ;
 			end
 
 			LB : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'b00 ;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1	 ;
@@ -94,12 +98,13 @@ module Control (
 				RegWrite = 1'b1	 ;
 				MemtoReg = 2'b01 ;
 				Jump     = 1'b0	 ;
-				Signed   = 1'b1	 ;
+				MemSign  = 1'b1	 ;
 				Long     = 2'b00 ;
 				Halt     = 1'b0  ;
 			end
 
 			LH : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -110,12 +115,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b01;
 				Jump     = 1'b0;
-				Signed   = 1'b1;
+				MemSign  = 1'b1;
 				Long     = 2'b01;
 				Halt     = 1'b0;
 			end
 
 			LW : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -126,13 +132,14 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b01;
 				Jump     = 1'b0;
-				Signed   = 1'b1;
+				MemSign  = 1'b1;
 				Long     = 2'b11;
 				Halt     = 1'b0;
 
 			end
 
 			LWU : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -143,12 +150,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b01;
 				Jump     = 1'b0;
-				Signed   = 1'b0;
+				MemSign  = 1'b0;
 				Long     = 2'b00;
 				Halt     = 1'b0;
 			end
 
 			LBU : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -159,11 +167,12 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b01;
 				Jump     = 1'b0;
-				Signed   = 1'b0;
+				MemSign  = 1'b0;
 				Long     = 2'b01;
 				Halt     = 1'b0;
 			end
 			LHU : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -174,11 +183,12 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b01;
 				Jump     = 1'b0;
-				Signed   = 1'b0;
+				MemSign  = 1'b0;
 				Long     = 2'b11;
 				Halt     = 1'b0;
 			end
 			SB : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'bXX;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -189,12 +199,13 @@ module Control (
 				RegWrite = 1'b0;
 				MemtoReg = 2'bXX;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'b00;
 				Halt     = 1'b0;
 			end
 
 			SH : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'bXX;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -205,12 +216,13 @@ module Control (
 				RegWrite = 1'b0;
 				MemtoReg = 2'bXX;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'b01;
 				Halt     = 1'b0;
 			end
 
 			SW : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'bXX;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -221,12 +233,13 @@ module Control (
 				RegWrite = 1'b0;
 				MemtoReg = 2'bXX;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'b11;
 				Halt     = 1'b0;
 			end
 
 			ADDI : begin
+				Signed   = 1'b0  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b1;
@@ -237,12 +250,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b00;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 
 			ANDI : begin
+				Signed   = 1'b0  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b100;
 				ALUSrc   = 1'b1;
@@ -253,12 +267,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b00;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 
 			ORI : begin
+				Signed   = 1'b0  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b101;
 				ALUSrc   = 1'b1;
@@ -269,12 +284,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b00;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 
 			XORI : begin
+				Signed   = 1'b0  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b110;
 				ALUSrc   = 1'b1;
@@ -285,12 +301,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b00;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 
 			LUI : begin
+				Signed   = 1'b0  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b111;
 				ALUSrc   = 1'b1;
@@ -301,12 +318,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b00;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 
 			SLTI : begin
+				Signed   = 1'b0  ;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b010;
 				ALUSrc   = 1'b1;
@@ -317,12 +335,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b00;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 
 			BEQ : begin
+				Signed   = 1'b1  ;
 				RegDst   = 2'bXX;
 				ALUOp    = 3'b001;
 				ALUSrc   = 1'b0;
@@ -333,11 +352,13 @@ module Control (
 				RegWrite = 1'b0;
 				MemtoReg = 2'bXX;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
+
 			BNE : begin
+				Signed   = 1'b0  ;
 				RegDst   = 2'bXX;
 				ALUOp    = 3'b001;
 				ALUSrc   = 1'b0;
@@ -348,11 +369,12 @@ module Control (
 				RegWrite = 1'b0;
 				MemtoReg = 2'bXX;
 				Jump     = 1'b0;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 			J : begin
+				Signed   = 1'bX  ;
 				RegDst   = 2'bXX;
 				ALUOp    = 3'bXXX;
 				ALUSrc   = 1'bX;
@@ -363,11 +385,12 @@ module Control (
 				RegWrite = 1'b0;
 				MemtoReg = 2'bXX;
 				Jump     = 1'b1;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 			JAL : begin
+				Signed   = 1'b0  ;
 				RegDst   = 2'b10;
 				ALUOp    = 3'bXXX;
 				ALUSrc   = 1'bX;
@@ -378,12 +401,13 @@ module Control (
 				RegWrite = 1'b1;
 				MemtoReg = 2'b10;
 				Jump     = 1'b1;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b0;
 			end
 
 			HLT : begin
+				Signed   = 1'bX  ;
 				RegDst   = 2'bXX;
 				ALUOp    = 3'bXXX;
 				ALUSrc   = 1'bX;
@@ -394,12 +418,13 @@ module Control (
 				RegWrite = 1'b0;
 				MemtoReg = 2'bXX;
 				Jump     = 1'bX;
-				Signed   = 1'bX;
+				MemSign  = 1'bX;
 				Long     = 2'bXX;
 				Halt     = 1'b1;
 			end
 
 			default : begin
+				Signed   = 1'b0;
 				RegDst   = 2'b00;
 				ALUOp    = 3'b000;
 				ALUSrc   = 1'b0;
@@ -410,7 +435,7 @@ module Control (
 				RegWrite = 1'b0;
 				MemtoReg = 2'b00;
 				Jump     = 1'b0;
-				Signed   = 1'b0;
+				MemSign  = 1'b0;
 				Long     = 2'b00;
 				Halt     = 1'b0;
 			end
@@ -431,6 +456,7 @@ module Control (
 	assign o_Jump     = Jump    ;
 	assign o_Signed   = Signed  ;
 	assign o_Long     = Long    ;
+	assign o_MemSign  = MemSign ;
 	assign o_Halt     = Halt    ;
 
 endmodule

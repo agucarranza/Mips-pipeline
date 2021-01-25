@@ -25,6 +25,7 @@ wire       SignZero ;
 wire       Jump     ;
 wire       JRControl;
 wire [1:0] Long     ;
+wire       MemSign  ;
 
 wire [1:0] ID_RegDst      ;
 wire [2:0] ID_ALUOp       ;
@@ -36,12 +37,14 @@ wire       ID_MemWrite    ;
 wire       ID_RegWrite    ;
 wire [1:0] ID_MemtoReg    ;
 wire [1:0] ID_Long        ;
+wire       ID_MemSign     ;
 wire       ID_JALR_Control;
 wire       EX_MemRead     ;
 wire       EX_MemWrite    ;
 wire       EX_RegWrite    ;
 wire [1:0] EX_MemtoReg    ;
 wire [1:0] EX_Long        ;
+wire       EX_MemSign     ;
 wire       MEM_RegWrite   ;
 wire [1:0] MEM_MemtoReg   ;
 
@@ -214,6 +217,7 @@ ID_EX i_ID_EX (
 	.i_MemRead    (ID_MemRead                                       ),
 	.i_MemWrite   (ID_MemWrite                                      ),
 	.i_Long       (ID_Long                                          ),
+	.i_MemSign    (ID_MemSign                                       ),
 	.i_RegDst     (ID_RegDst                                        ),
 	.i_ALUOp      (ID_ALUOp                                         ),
 	.i_ALUSrc     (ID_ALUSrc                                        ),
@@ -229,6 +233,7 @@ ID_EX i_ID_EX (
 	.o_MemRead    (EX_MemRead                                       ),
 	.o_MemWrite   (EX_MemWrite                                      ),
 	.o_Long       (EX_Long                                          ),
+	.o_MemSign    (EX_MemSign                                       ),
 	.o_RegDst     (RegDst                                           ),
 	.o_ALUOp      (ALUOp                                            ),
 	.o_ALUSrc     (ALUSrc                                           ),
@@ -287,6 +292,7 @@ EX_MEM i_EX_MEM (
 	.i_MemRead         (EX_MemRead                          ),
 	.i_MemWrite        (EX_MemWrite                         ),
 	.i_Long            (EX_Long                             ),
+	.i_MemSign         (EX_MemSign                          ),
 	.o_PC_Address      (EXMEM_to_MEMWB_PC_Address           ),
 	.o_ALU_result      (EXMEM_to_DataMem_to_MEMWB_ALUAddress), // ALUResult -> Address
 	.o_Read_data_2     (EXMEM_to_DataMem_WriteData          ), // ReadData2 -> WriteData
@@ -295,7 +301,8 @@ EX_MEM i_EX_MEM (
 	.o_MemtoReg        (MEM_MemtoReg                        ),
 	.o_MemRead         (MemRead                             ), // Control
 	.o_MemWrite        (MemWrite                            ), // Control
-	.o_Long            (Long                                )
+	.o_Long            (Long                                ),
+	.o_MemSign         (MemSign                             )
 );
 
 // MEM
@@ -308,6 +315,7 @@ Data_memory i_Data_memory (
 	.i_MemWrite  (MemWrite                            ),
 	.i_MemRead   (MemRead                             ),
 	.i_Long      (Long                                ),
+	.i_MemSign   (MemSign                             ),
 	.o_Read_data (DataMem_to_MEMWB_ReadData           )
 );
 
