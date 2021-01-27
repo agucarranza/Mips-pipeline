@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
-// `include "Mux.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
-// `include "Registers.v" `include "Control.v" `include "ID_EX.v"
-// `include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
-// `include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v"
+`include "Mux.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
+`include "Registers.v" `include "Control.v" `include "ID_EX.v" `include "Forwarding_unit.v"
+`include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
+`include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v" `include "Hazard_detec_unit.v"
 
 module MIPS
 	(
@@ -176,6 +176,7 @@ Control i_Control (
 	.o_Jump    (Jump              ),
 	.o_Signed  (SignZero          ),
 	.o_Long    (ID_Long           ),
+	.o_MemSign (ID_MemSign        ),
 	.o_Halt    (Halt              )
 );
 
@@ -345,5 +346,47 @@ MuxTres i_Mux_MemtoReg (
 	.i_Input_2(MEMWB_to_MuxMemtoReg_PC_Address   ),
 	.o_Salida (MuxMemtoReg_to_Registers_WriteData)
 );
+
+// Riesgos
+
+
+	wire i_IDEX_MemRead;
+	wire [4:0] i_IFID_RegisterRs;
+	wire [4:0] i_IFID_RegisterRt;
+	wire [4:0] i_IDEX_RegisterRt;
+	wire o_StallControl;
+	wire o_IFID_Write;
+	wire o_PCWrite;
+Hazard_detec_unit i_Hazard_detec_unit (
+	.i_IDEX_MemRead   (i_IDEX_MemRead   ),
+	.i_IFID_RegisterRs(i_IFID_RegisterRs),
+	.i_IFID_RegisterRt(i_IFID_RegisterRt),
+	.i_IDEX_RegisterRt(i_IDEX_RegisterRt),
+	.o_StallControl   (o_StallControl   ),
+	.o_IFID_Write     (o_IFID_Write     ),
+	.o_PCWrite        (o_PCWrite        )
+);
+
+
+	wire [4:0] i_IDEX_RegisterRs;
+	wire i_EXMEM_RegWrite;
+	wire [4:0] i_EXMEM_RegisterRd;
+	wire [4:0] i_MEMWB_RegisterRd;
+	wire i_MEMWB_RegWrite;
+	wire [1:0] o_ForwardA;
+	wire [1:0] o_ForwardB;
+Forwarding_unit i_Forwarding_unit (
+	.i_IDEX_RegisterRs (i_IDEX_RegisterRs ),
+	.i_IDEX_RegisterRt (i_IDEX_RegisterRt ),
+	.i_EXMEM_RegWrite  (i_EXMEM_RegWrite  ),
+	.i_EXMEM_RegisterRd(i_EXMEM_RegisterRd),
+	.i_MEMWB_RegisterRd(i_MEMWB_RegisterRd),
+	.i_MEMWB_RegWrite  (i_MEMWB_RegWrite  ),
+	.o_ForwardA        (o_ForwardA        ),
+	.o_ForwardB        (o_ForwardB        )
+);
+
+
+
 
 endmodule

@@ -459,4 +459,8 @@ module Control (
 	assign o_MemSign  = MemSign ;
 	assign o_Halt     = Halt    ;
 
+	// Riesgos
+
+	wire IF_Flush = o_Branch | o_Branchne | o_Jump ; 
+
 endmodule

@@ -16,7 +16,7 @@ module Registers (
 	reg [31:0] Read_data_1      ;
 	reg [31:0] Read_data_2      ;
 
-	initial begin 
+	initial begin
 		registers[1] = 32'h2;
 		registers[2] = 32'h4;
 		registers[3] = 32'h6;
@@ -25,6 +25,8 @@ module Registers (
 		registers[6] = 32'h2;
 		registers[7] = 32'hf;
 		registers[8] = 32'h1;
+		registers[9] = 32'h14;
+		registers[18] = 32'h19;
 
 	end
 
@@ -48,14 +50,17 @@ module Registers (
 		end
 	end
 
-	always @(posedge i_clk) begin 
+	always @(posedge i_clk) begin
 		$display("Registros:");
-		$display("%h",registers[1]);
-		$display("%h",registers[2]);
-		$display("%h",registers[3]);
-		$display("%h",registers[4]);
-		$display("%h",registers[5]);
-		$display("%h",registers[6]);
+		$display("%h, %h, %h, %h, %h, %h, %h, <--R31",
+			registers[1],
+			registers[2],
+			registers[3],
+			registers[4],
+			registers[5],
+			registers[6],
+			registers[31]);
+		$display("");
 	end
 
 

@@ -66,12 +66,14 @@ module Data_memory (
 
 	always @(posedge i_clk) begin
 		$display("Memoria de datos");
-		$display("%h",registers[1]);
-		$display("%h",registers[2]);
-		$display("%h",registers[3]);
-		$display("%h",registers[4]);
-		$display("%h",registers[5]);
-		$display("%h",registers[6]);
+		$display("%h, %h, %h, %h, %h, %h",
+			registers[1],
+			registers[2],
+			registers[3],
+			registers[4],
+			registers[5],
+			registers[6]);
+		$display("");
 	end
 
 endmodule

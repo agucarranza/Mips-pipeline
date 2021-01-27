@@ -29,8 +29,7 @@ module MEM_WB (
 	reg       RegWrite;
 	reg [1:0] MemtoReg;
 
-	initial begin
-	end
+	
 
 	always @(negedge clk) begin : proc_registers
 		if(rst) begin
@@ -45,7 +44,7 @@ module MEM_WB (
 			RegWrite <= i_RegWrite;
 			MemtoReg <= i_MemtoReg;
 
-			PC_Address       <= i_ALUAddress      ;
+			PC_Address       <= i_PC_Address      ;
 			Read_data        <= i_Read_data       ;
 			ALUAddress       <= i_ALUAddress      ;
 			MuxRegDst_result <= i_MuxRegDst_result;

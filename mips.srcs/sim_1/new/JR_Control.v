@@ -7,8 +7,8 @@ module JR_Control (
 	output wire       o_JALR_Control
 );
 
-	localparam JR    = 6'b001001;
-	localparam JALR  = 6'b001000;
+	localparam JR    = 6'b001000;
+	localparam JALR  = 6'b001001;
 	localparam AluOp = 3'b011   ;
 
 	reg JR_Control   = 1'b0;

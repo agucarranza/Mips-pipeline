@@ -10,7 +10,7 @@ module PC (
 	reg [31:0] ProgCounter;
 
 	
-	always @(posedge i_clk) begin
+	always @(negedge i_clk) begin
 		if (i_rst) begin
 			ProgCounter <= 32'b0;
 		end else begin
