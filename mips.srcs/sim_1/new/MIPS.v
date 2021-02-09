@@ -1,8 +1,11 @@
 `timescale 1ns / 1ps
-`include "Mux.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
+
+`include "MuxControl.v"
+`include "Mux.v" `include "MuxCuatro.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
 `include "Registers.v" `include "Control.v" `include "ID_EX.v" `include "Forwarding_unit.v"
 `include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
-`include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v" `include "Hazard_detec_unit.v"
+`include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v" `include "Hazard_detec_unit.v" 
+
 
 module MIPS
 	(
@@ -59,6 +62,9 @@ wire [31:0] AddPC_to_MuxBranch_to_IFID; // Salida AddPC
 wire [31:0] Add_to_MuxBranch_PCAddress;
 wire [31:0] MuxBranch_to_MuxJump0     ;
 wire [31:0] MuxJump_to_MuxJR0         ;
+
+wire IF_Flush;
+
 // ID
 wire [31:0] Instruction                                      ;
 wire [ 4:0] MEMWB_to_Registers_WriteRegister                 ;
@@ -136,9 +142,12 @@ Instruction_memory i_Instruction_memory (
 	.o_Instruction (InstMem_to_IFID       )
 );
 
+assign IF_Flush = Branch | Jump | JRControl;
+
 IF_ID i_IF_ID (
 	.clk          (clk                          ),
 	.rst          (rst                          ),
+	.i_IF_Flush   (IF_Flush),
 	.i_PC_Address (AddPC_to_MuxBranch_to_IFID   ),
 	.i_Instruction(InstMem_to_IFID              ),
 	.o_PC_Address (IFID_to_IDEX_to_Add_PCAddress),
@@ -160,7 +169,30 @@ Registers i_Registers (
 	.o_Read_data_2    (Registers_to_IDEX_ReadData2         )
 );
 
+wire [31:0] ID_A;
+wire [31:0] ID_B;
+	
+MuxCuatro i_MuxA (
+	.i_Control(i_Control),
+	.i_Input_0(ID_A),
+	.i_Input_1(i_Input_1),
+	.i_Input_2(i_Input_2),
+	.i_Input_3(i_Input_3),
+	.o_Salida (o_Salida )
+);
+
+MuxCuatro i_MuxB (
+	.i_Control(i_Control),
+	.i_Input_0(ID_B),
+	.i_Input_1(i_Input_1),
+	.i_Input_2(i_Input_2),
+	.i_Input_3(i_Input_3),
+	.o_Salida (o_Salida )
+);
+
 assign Comparador = (Registers_to_IDEX_to_MuxJR_ReadData1 == Registers_to_IDEX_ReadData2);
+
+
 
 Control i_Control (
 	.i_Op      (Instruction[31:26]),
@@ -179,6 +211,8 @@ Control i_Control (
 	.o_MemSign (ID_MemSign        ),
 	.o_Halt    (Halt              )
 );
+
+
 
 assign Branch = ( (ID_Branch & Comparador) | (ID_Branchne & ~Comparador) );
 

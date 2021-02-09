@@ -26,6 +26,7 @@ module Registers (
 		registers[7] = 32'hf;
 		registers[8] = 32'h1;
 		registers[9] = 32'h14;
+		registers[10] = 32'h7;
 		registers[18] = 32'h19;
 
 	end
@@ -60,7 +61,6 @@ module Registers (
 			registers[5],
 			registers[6],
 			registers[31]);
-		$display("");
 	end
 
 

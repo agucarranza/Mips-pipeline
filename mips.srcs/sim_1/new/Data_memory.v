@@ -23,6 +23,7 @@ module Data_memory (
 		registers[4] = 32'h0000_0009;
 		registers[5] = 32'h0000_000F;
 		registers[6] = 32'h0000_0002;
+		registers[7] = 32'h1234_D678;
 	end
 
 
@@ -36,8 +37,11 @@ module Data_memory (
 		end
 	end
 
-	wire [23:0] extension24 = (i_MemSign) ? {24{tmp_read[ 7]}} : 24'b0; 
-	wire [15:0] extension16 = (i_MemSign) ? {16{tmp_read[15]}} : 16'b0;
+	wire [23:0] extension24; 
+	assign extension24 = (i_MemSign) ? {24{tmp_read[ 7]}} : 24'b0; 
+	
+	wire [15:0] extension16;
+	assign extension16 = (i_MemSign) ? {16{tmp_read[15]}} : 16'b0;
 
 	assign o_Read_data = (i_Long == 2'b00) ? { extension24 ,tmp_read[ 7:0] } :
 						 (i_Long == 2'b01) ? { extension16 ,tmp_read[15:0] } :

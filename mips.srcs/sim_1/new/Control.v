@@ -151,7 +151,7 @@ module Control (
 				MemtoReg = 2'b01;
 				Jump     = 1'b0;
 				MemSign  = 1'b0;
-				Long     = 2'b00;
+				Long     = 2'b11;
 				Halt     = 1'b0;
 			end
 
@@ -168,7 +168,7 @@ module Control (
 				MemtoReg = 2'b01;
 				Jump     = 1'b0;
 				MemSign  = 1'b0;
-				Long     = 2'b01;
+				Long     = 2'b00;
 				Halt     = 1'b0;
 			end
 			LHU : begin
@@ -184,7 +184,7 @@ module Control (
 				MemtoReg = 2'b01;
 				Jump     = 1'b0;
 				MemSign  = 1'b0;
-				Long     = 2'b11;
+				Long     = 2'b01;
 				Halt     = 1'b0;
 			end
 			SB : begin
