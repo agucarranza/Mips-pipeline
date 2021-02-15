@@ -125,7 +125,8 @@ Mux i_Mux_JR (
 PC i_PC (
 	.i_clk    (clk                   ),
 	.i_rst    (rst                   ),
-	.i_address(MuxJR_to_PC        ),
+	.i_enable (1'b1                  ),
+	.i_address(MuxJR_to_PC           ),
 	.o_address(PC_to_AddPC_to_InstMem)
 );
 
@@ -165,29 +166,50 @@ Registers i_Registers (
 	.i_Read_register_2(Instruction[20:16]                  ),
 	.i_Write_register (MEMWB_to_Registers_WriteRegister    ),
 	.i_Write_data     (MuxMemtoReg_to_Registers_WriteData  ),
-	.o_Read_data_1    (Registers_to_IDEX_to_MuxJR_ReadData1),
-	.o_Read_data_2    (Registers_to_IDEX_ReadData2         )
+	.o_Read_data_1    (ID_A                                ),
+	.o_Read_data_2    (ID_B                                )
 );
 
 wire [31:0] ID_A;
 wire [31:0] ID_B;
+
+wire ID_BranchForwardA;
+wire ID_BranchForwardB;
+
+
+
+	
+BranchForwarding i_BranchForwarding (
+	.i_IDEX_RegWrite   (i_IDEX_RegWrite   ),
+	.i_EXMEM_RegWrite  (i_EXMEM_RegWrite  ),
+	.i_MEMWB_RegWrite  (i_MEMWB_RegWrite  ),
+	.i_IDEX_RegisterRD (i_IDEX_RegisterRD ),
+	.i_EXMEM_RegisterRD(i_EXMEM_RegisterRD),
+	.i_MEMWB_RegisterRD(i_MEMWB_RegisterRD),
+	.i_Rs              (i_Rs              ),
+	.i_Rt              (i_Rt              ),
+	.o_ForwardA        (ID_BranchForwardA ),
+	.o_ForwardB        (ID_BranchForwardB )
+);
+
+
 	
 MuxCuatro i_MuxA (
-	.i_Control(i_Control),
+	.i_Control(ID_BranchForwardA),
 	.i_Input_0(ID_A),
-	.i_Input_1(i_Input_1),
-	.i_Input_2(i_Input_2),
-	.i_Input_3(i_Input_3),
-	.o_Salida (o_Salida )
+	.i_Input_1(ALU_to_EXMEM_ALUResult),
+	.i_Input_2(DataMem_to_MEMWB_ReadData),
+	.i_Input_3(MuxMemtoReg_to_Registers_WriteData),
+	.o_Salida (Registers_to_IDEX_to_MuxJR_ReadData1)
 );
 
 MuxCuatro i_MuxB (
-	.i_Control(i_Control),
+	.i_Control(ID_BranchForwardB),
 	.i_Input_0(ID_B),
-	.i_Input_1(i_Input_1),
-	.i_Input_2(i_Input_2),
-	.i_Input_3(i_Input_3),
-	.o_Salida (o_Salida )
+	.i_Input_1(ALU_to_EXMEM_ALUResult),
+	.i_Input_2(DataMem_to_MEMWB_ReadData),
+	.i_Input_3(MuxMemtoReg_to_Registers_WriteData),
+	.o_Salida (Registers_to_IDEX_ReadData2)
 );
 
 assign Comparador = (Registers_to_IDEX_to_MuxJR_ReadData1 == Registers_to_IDEX_ReadData2);
@@ -391,6 +413,8 @@ MuxTres i_Mux_MemtoReg (
 	wire o_StallControl;
 	wire o_IFID_Write;
 	wire o_PCWrite;
+
+
 Hazard_detec_unit i_Hazard_detec_unit (
 	.i_IDEX_MemRead   (i_IDEX_MemRead   ),
 	.i_IFID_RegisterRs(i_IFID_RegisterRs),
