@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 
-`include "MuxControl.v"
-`include "Mux.v" `include "MuxCuatro.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
-`include "Registers.v" `include "Control.v" `include "ID_EX.v" `include "Forwarding_unit.v"
-`include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
-`include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v" `include "Hazard_detec_unit.v" 
 
+`include "Mux.v" `include "MuxCuatro.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
+`include "Registers.v" `include "Control.v" `include "ID_EX.v" `include "Forwarding_unit.v" `include "BranchForwarding.v"
+`include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
+`include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v" `include "Hazard_detec_unit.v"
+`include "MuxControl.v"
 
 module MIPS
 	(
@@ -56,7 +56,7 @@ wire Halt;
 
 // IF
 wire [31:0] PC_to_AddPC_to_InstMem    ;
-wire [31:0] MuxJR_to_PC            ;
+wire [31:0] MuxJR_to_PC               ;
 wire [31:0] InstMem_to_IFID           ; // Salida Memoria de Instrucciones
 wire [31:0] AddPC_to_MuxBranch_to_IFID; // Salida AddPC
 wire [31:0] Add_to_MuxBranch_PCAddress;
@@ -77,10 +77,11 @@ wire [31:0] IFID_to_MuxJump_PCAddress                        ;
 wire        Comparador                                       ;
 // EX
 wire [31:0] IDEX_to_MuxJALR_to_EXMEM_PCAddress              ;
-wire [31:0] IDEX_to_MuxJALR_ReadData1                       ;
+wire [31:0] IDEX_to_MuxForwardA_ReadData1                   ;
 wire [31:0] IDEX_to_MuxALUSrc_to_EXMEM_ReadData2            ;
 wire [ 4:0] IDEX_to_MuxRegDst_rt_0                          ;
 wire [ 4:0] IDEX_to_MuxRegDst_rd_1                          ;
+wire [ 4:0] IDEX_to_Forwarding_rs                           ;
 wire [31:0] IDEX_to_ALUControl_to_Add_to_MuxALUSrc_Immediate;
 wire [31:0] MuxALUSrc_to_ALU_Operand2                       ;
 wire [ 3:0] ALUControl_to_ALU_Operation                     ;
@@ -119,13 +120,13 @@ Mux i_Mux_JR (
 	.i_Control(JRControl                           ),
 	.i_Input_0(MuxJump_to_MuxJR0                   ),
 	.i_Input_1(Registers_to_IDEX_to_MuxJR_ReadData1),
-	.o_Salida (MuxJR_to_PC                      )
+	.o_Salida (MuxJR_to_PC                         )
 );
 
 PC i_PC (
 	.i_clk    (clk                   ),
 	.i_rst    (rst                   ),
-	.i_enable (1'b1                  ),
+	.i_enable (~Stall                ),
 	.i_address(MuxJR_to_PC           ),
 	.o_address(PC_to_AddPC_to_InstMem)
 );
@@ -145,10 +146,14 @@ Instruction_memory i_Instruction_memory (
 
 assign IF_Flush = Branch | Jump | JRControl;
 
+wire Stall;
+
 IF_ID i_IF_ID (
 	.clk          (clk                          ),
 	.rst          (rst                          ),
-	.i_IF_Flush   (IF_Flush),
+	.i_IF_Flush   (IF_Flush                     ),
+	.i_Stall      (Stall                        ),
+	.i_Halt       (Halt                         ),
 	.i_PC_Address (AddPC_to_MuxBranch_to_IFID   ),
 	.i_Instruction(InstMem_to_IFID              ),
 	.o_PC_Address (IFID_to_IDEX_to_Add_PCAddress),
@@ -156,82 +161,142 @@ IF_ID i_IF_ID (
 );
 
 // ID
+
+Hazard_detec_unit i_Hazard_detec_unit (
+	.i_IDEX_MemRead   (EX_MemRead            ),
+	.i_IFID_RegisterRs(Instruction[25:21]    ),
+	.i_IFID_RegisterRt(Instruction[20:16]    ),
+	.i_IDEX_RegisterRt(IDEX_to_MuxRegDst_rt_0),
+	.o_Stall          (Stall                 )
+);
+
+
 assign IFID_to_MuxJump_PCAddress = {IFID_to_IDEX_to_Add_PCAddress[31:26], Instruction[25:0]};
 
 Registers i_Registers (
-	.i_clk            (clk                                 ),
-	.i_rst            (rst                                 ),
-	.i_RegWrite       (RegWrite                            ),
-	.i_Read_register_1(Instruction[25:21]                  ),
-	.i_Read_register_2(Instruction[20:16]                  ),
-	.i_Write_register (MEMWB_to_Registers_WriteRegister    ),
-	.i_Write_data     (MuxMemtoReg_to_Registers_WriteData  ),
-	.o_Read_data_1    (ID_A                                ),
-	.o_Read_data_2    (ID_B                                )
+	.i_clk            (clk                               ),
+	.i_rst            (rst                               ),
+	.i_RegWrite       (RegWrite                          ),
+	.i_Read_register_1(Instruction[25:21]                ),
+	.i_Read_register_2(Instruction[20:16]                ),
+	.i_Write_register (MEMWB_to_Registers_WriteRegister  ),
+	.i_Write_data     (MuxMemtoReg_to_Registers_WriteData),
+	.o_Read_data_1    (ID_A                              ),
+	.o_Read_data_2    (ID_B                              )
 );
 
 wire [31:0] ID_A;
 wire [31:0] ID_B;
 
-wire ID_BranchForwardA;
-wire ID_BranchForwardB;
+wire [1:0] ID_BranchForwardA;
+wire [1:0] ID_BranchForwardB;
 
 
 
-	
+
 BranchForwarding i_BranchForwarding (
-	.i_IDEX_RegWrite   (i_IDEX_RegWrite   ),
-	.i_EXMEM_RegWrite  (i_EXMEM_RegWrite  ),
-	.i_MEMWB_RegWrite  (i_MEMWB_RegWrite  ),
-	.i_IDEX_RegisterRD (i_IDEX_RegisterRD ),
-	.i_EXMEM_RegisterRD(i_EXMEM_RegisterRD),
-	.i_MEMWB_RegisterRD(i_MEMWB_RegisterRD),
-	.i_Rs              (i_Rs              ),
-	.i_Rt              (i_Rt              ),
-	.o_ForwardA        (ID_BranchForwardA ),
-	.o_ForwardB        (ID_BranchForwardB )
+	.i_IDEX_RegWrite   (EX_RegWrite                     ),
+	.i_EXMEM_RegWrite  (MEM_RegWrite                    ),
+	.i_MEMWB_RegWrite  (RegWrite                        ),
+	.i_IDEX_RegisterRD (MuxRegDst_to_EXMEM_Result       ),
+	.i_EXMEM_RegisterRD(EXMEM_to_MEMWB_Result           ),
+	.i_MEMWB_RegisterRD(MEMWB_to_Registers_WriteRegister),
+	.i_Rs              (Instruction[25:21]              ),
+	.i_Rt              (Instruction[20:16]              ),
+	.o_ForwardA        (ID_BranchForwardA               ),
+	.o_ForwardB        (ID_BranchForwardB               )
 );
 
 
-	
+
 MuxCuatro i_MuxA (
-	.i_Control(ID_BranchForwardA),
-	.i_Input_0(ID_A),
-	.i_Input_1(ALU_to_EXMEM_ALUResult),
-	.i_Input_2(DataMem_to_MEMWB_ReadData),
-	.i_Input_3(MuxMemtoReg_to_Registers_WriteData),
+	.i_Control(ID_BranchForwardA                   ),
+	.i_Input_0(ID_A                                ),
+	.i_Input_1(ALU_to_EXMEM_ALUResult              ),
+	.i_Input_2(DataMem_to_MEMWB_ReadData           ),
+	.i_Input_3(MuxMemtoReg_to_Registers_WriteData  ),
 	.o_Salida (Registers_to_IDEX_to_MuxJR_ReadData1)
 );
 
 MuxCuatro i_MuxB (
-	.i_Control(ID_BranchForwardB),
-	.i_Input_0(ID_B),
-	.i_Input_1(ALU_to_EXMEM_ALUResult),
-	.i_Input_2(DataMem_to_MEMWB_ReadData),
+	.i_Control(ID_BranchForwardB                 ),
+	.i_Input_0(ID_B                              ),
+	.i_Input_1(ALU_to_EXMEM_ALUResult            ),
+	.i_Input_2(DataMem_to_MEMWB_ReadData         ),
 	.i_Input_3(MuxMemtoReg_to_Registers_WriteData),
-	.o_Salida (Registers_to_IDEX_ReadData2)
+	.o_Salida (Registers_to_IDEX_ReadData2       )
 );
 
 assign Comparador = (Registers_to_IDEX_to_MuxJR_ReadData1 == Registers_to_IDEX_ReadData2);
 
 
 
+wire       MuxControl_StallControl;
+wire [1:0] MuxControl_RegDst      ;
+wire [2:0] MuxControl_ALUOp       ;
+wire       MuxControl_ALUSrc      ;
+wire       MuxControl_Branch      ;
+wire       MuxControl_Branchne    ;
+wire       MuxControl_MemRead     ;
+wire       MuxControl_MemWrite    ;
+wire       MuxControl_RegWrite    ;
+wire [1:0] MuxControl_MemtoReg    ;
+wire       MuxControl_Jump        ;
+wire       MuxControl_Signed      ;
+wire [1:0] MuxControl_Long        ;
+wire       MuxControl_MemSign     ;
+wire       MuxControl_Halt        ;
+
+
+MuxControl i_MuxControl (
+	.i_StallControl(MuxControl_StallControl),
+	.i_RegDst      (MuxControl_RegDst      ),
+	.i_ALUOp       (MuxControl_ALUOp       ),
+	.i_ALUSrc      (MuxControl_ALUSrc      ),
+	.i_Branch      (MuxControl_Branch      ),
+	.i_Branchne    (MuxControl_Branchne    ),
+	.i_MemRead     (MuxControl_MemRead     ),
+	.i_MemWrite    (MuxControl_MemWrite    ),
+	.i_RegWrite    (MuxControl_RegWrite    ),
+	.i_MemtoReg    (MuxControl_MemtoReg    ),
+	.i_Jump        (MuxControl_Jump        ),
+	.i_Signed      (MuxControl_Signed      ),
+	.i_Long        (MuxControl_Long        ),
+	.i_MemSign     (MuxControl_MemSign     ),
+	.i_Halt        (MuxControl_Halt        ),
+	.o_RegDst      (ID_RegDst              ),
+	.o_ALUOp       (ID_ALUOp               ),
+	.o_ALUSrc      (ID_ALUSrc              ),
+	.o_Branch      (ID_Branch              ),
+	.o_Branchne    (ID_Branchne            ),
+	.o_MemRead     (ID_MemRead             ),
+	.o_MemWrite    (ID_MemWrite            ),
+	.o_RegWrite    (ID_RegWrite            ),
+	.o_MemtoReg    (ID_MemtoReg            ),
+	.o_Jump        (Jump                   ),
+	.o_Signed      (SignZero               ),
+	.o_Long        (ID_Long                ),
+	.o_MemSign     (ID_MemSign             ),
+	.o_Halt        (Halt                   )
+);
+
+
 Control i_Control (
-	.i_Op      (Instruction[31:26]),
-	.o_RegDst  (ID_RegDst         ),
-	.o_ALUOp   (ID_ALUOp          ),
-	.o_ALUSrc  (ID_ALUSrc         ),
-	.o_Branch  (ID_Branch         ),
-	.o_Branchne(ID_Branchne       ),
-	.o_MemRead (ID_MemRead        ),
-	.o_MemWrite(ID_MemWrite       ),
-	.o_RegWrite(ID_RegWrite       ),
-	.o_MemtoReg(ID_MemtoReg       ),
-	.o_Jump    (Jump              ),
-	.o_Signed  (SignZero          ),
-	.o_Long    (ID_Long           ),
-	.o_MemSign (ID_MemSign        ),
-	.o_Halt    (Halt              )
+	.i_Op      (Instruction[31:26] ),
+	.o_RegDst  (MuxControl_RegDst  ),
+	.o_ALUOp   (MuxControl_ALUOp   ),
+	.o_ALUSrc  (MuxControl_ALUSrc  ),
+	.o_Branch  (MuxControl_Branch  ),
+	.o_Branchne(MuxControl_Branchne),
+	.o_MemRead (MuxControl_MemRead ),
+	.o_MemWrite(MuxControl_MemWrite),
+	.o_RegWrite(MuxControl_RegWrite),
+	.o_MemtoReg(MuxControl_MemtoReg),
+	.o_Jump    (MuxControl_Jump    ),
+	.o_Signed  (MuxControl_Signed  ),
+	.o_Long    (MuxControl_Long    ),
+	.o_MemSign (MuxControl_MemSign ),
+	.o_Halt    (MuxControl_Halt    )
 );
 
 
@@ -269,6 +334,7 @@ ID_EX i_ID_EX (
 	.i_Immediate  (MuxSignZero_to_IDEX_to_Add_to_JRControl_Immediate), // Sign extension con el mux
 	.i_rt         (Instruction[20:16]                               ),
 	.i_rd         (Instruction[15:11]                               ),
+	.i_rs         (Instruction[25:21]                               ),
 	.i_RegWrite   (ID_RegWrite                                      ),
 	.i_MemtoReg   (ID_MemtoReg                                      ),
 	.i_MemRead    (ID_MemRead                                       ),
@@ -280,11 +346,12 @@ ID_EX i_ID_EX (
 	.i_ALUSrc     (ID_ALUSrc                                        ),
 	.i_JALRCtrl   (ID_JALR_Control                                  ),
 	.o_PC_Address (IDEX_to_MuxJALR_to_EXMEM_PCAddress               ),
-	.o_Read_data_1(IDEX_to_MuxJALR_ReadData1                        ),
+	.o_Read_data_1(IDEX_to_MuxForwardA_ReadData1                    ),
 	.o_Read_data_2(IDEX_to_MuxALUSrc_to_EXMEM_ReadData2             ),
 	.o_Immediate  (IDEX_to_ALUControl_to_Add_to_MuxALUSrc_Immediate ),
 	.o_rt         (IDEX_to_MuxRegDst_rt_0                           ),
 	.o_rd         (IDEX_to_MuxRegDst_rd_1                           ),
+	.o_rs         (IDEX_to_Forwarding_rs                            ),
 	.o_RegWrite   (EX_RegWrite                                      ),
 	.o_MemtoReg   (EX_MemtoReg                                      ),
 	.o_MemRead    (EX_MemRead                                       ),
@@ -298,18 +365,41 @@ ID_EX i_ID_EX (
 );
 
 // EX
-Mux i_MuxALUSrc (
-	.i_Control(ALUSrc                                          ),
-	.i_Input_0(IDEX_to_MuxALUSrc_to_EXMEM_ReadData2            ),
-	.i_Input_1(IDEX_to_ALUControl_to_Add_to_MuxALUSrc_Immediate),
-	.o_Salida (MuxALUSrc_to_ALU_Operand2                       )
+
+
+wire [ 1:0] EX_ForwardA             ;
+wire [ 1:0] EX_ForwardB             ;
+wire [31:0] MuxForwardA_to_MuxJALR  ;
+wire [31:0] MuxForwardB_to_MuxALUSrc;
+
+MuxTres i_MuxForwardA (
+	.i_Control(EX_ForwardA                         ),
+	.i_Input_0(IDEX_to_MuxForwardA_ReadData1       ),
+	.i_Input_1(MuxMemtoReg_to_Registers_WriteData  ),
+	.i_Input_2(EXMEM_to_DataMem_to_MEMWB_ALUAddress),
+	.o_Salida (MuxForwardA_to_MuxJALR              )
 );
 
 Mux i_Mux_JALR (
 	.i_Control(JARL_Control                      ),
-	.i_Input_0(IDEX_to_MuxJALR_ReadData1         ),
+	.i_Input_0(MuxForwardA_to_MuxJALR            ),
 	.i_Input_1(IDEX_to_MuxJALR_to_EXMEM_PCAddress),
 	.o_Salida (MuxJALR_to_ALU_Operand1           )
+);
+
+MuxTres i_MuxForwardB (
+	.i_Control(EX_ForwardB                         ),
+	.i_Input_0(IDEX_to_MuxALUSrc_to_EXMEM_ReadData2),
+	.i_Input_1(MuxMemtoReg_to_Registers_WriteData  ),
+	.i_Input_2(EXMEM_to_DataMem_to_MEMWB_ALUAddress),
+	.o_Salida (MuxForwardB_to_MuxALUSrc            )
+);
+
+Mux i_MuxALUSrc (
+	.i_Control(ALUSrc                                          ),
+	.i_Input_0(MuxForwardB_to_MuxALUSrc                        ),
+	.i_Input_1(IDEX_to_ALUControl_to_Add_to_MuxALUSrc_Immediate),
+	.o_Salida (MuxALUSrc_to_ALU_Operand2                       )
 );
 
 
@@ -335,6 +425,18 @@ MuxTres #(.BUS_SIZE(5)) i_MuxRegDst (
 	.i_Input_1(IDEX_to_MuxRegDst_rd_1   ),
 	.i_Input_2(5'd31                    ), // JAL Instruction
 	.o_Salida (MuxRegDst_to_EXMEM_Result)
+);
+
+
+Forwarding_unit i_Forwarding_unit (
+	.i_IDEX_RegisterRs (IDEX_to_Forwarding_rs           ),
+	.i_IDEX_RegisterRt (IDEX_to_MuxRegDst_rt_0          ),
+	.i_EXMEM_RegWrite  (MEM_RegWrite                    ),
+	.i_EXMEM_RegisterRd(MuxRegDst_to_EXMEM_Result       ),
+	.i_MEMWB_RegisterRd(MEMWB_to_Registers_WriteRegister),
+	.i_MEMWB_RegWrite  (RegWrite                        ),
+	.o_ForwardA        (EX_ForwardA                     ),
+	.o_ForwardB        (EX_ForwardB                     )
 );
 
 EX_MEM i_EX_MEM (
@@ -402,49 +504,5 @@ MuxTres i_Mux_MemtoReg (
 	.i_Input_2(MEMWB_to_MuxMemtoReg_PC_Address   ),
 	.o_Salida (MuxMemtoReg_to_Registers_WriteData)
 );
-
-// Riesgos
-
-
-	wire i_IDEX_MemRead;
-	wire [4:0] i_IFID_RegisterRs;
-	wire [4:0] i_IFID_RegisterRt;
-	wire [4:0] i_IDEX_RegisterRt;
-	wire o_StallControl;
-	wire o_IFID_Write;
-	wire o_PCWrite;
-
-
-Hazard_detec_unit i_Hazard_detec_unit (
-	.i_IDEX_MemRead   (i_IDEX_MemRead   ),
-	.i_IFID_RegisterRs(i_IFID_RegisterRs),
-	.i_IFID_RegisterRt(i_IFID_RegisterRt),
-	.i_IDEX_RegisterRt(i_IDEX_RegisterRt),
-	.o_StallControl   (o_StallControl   ),
-	.o_IFID_Write     (o_IFID_Write     ),
-	.o_PCWrite        (o_PCWrite        )
-);
-
-
-	wire [4:0] i_IDEX_RegisterRs;
-	wire i_EXMEM_RegWrite;
-	wire [4:0] i_EXMEM_RegisterRd;
-	wire [4:0] i_MEMWB_RegisterRd;
-	wire i_MEMWB_RegWrite;
-	wire [1:0] o_ForwardA;
-	wire [1:0] o_ForwardB;
-Forwarding_unit i_Forwarding_unit (
-	.i_IDEX_RegisterRs (i_IDEX_RegisterRs ),
-	.i_IDEX_RegisterRt (i_IDEX_RegisterRt ),
-	.i_EXMEM_RegWrite  (i_EXMEM_RegWrite  ),
-	.i_EXMEM_RegisterRd(i_EXMEM_RegisterRd),
-	.i_MEMWB_RegisterRd(i_MEMWB_RegisterRd),
-	.i_MEMWB_RegWrite  (i_MEMWB_RegWrite  ),
-	.o_ForwardA        (o_ForwardA        ),
-	.o_ForwardB        (o_ForwardB        )
-);
-
-
-
 
 endmodule

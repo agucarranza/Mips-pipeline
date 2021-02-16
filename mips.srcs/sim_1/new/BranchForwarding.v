@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module BranchForwarding (
 	input  wire       i_IDEX_RegWrite   ,
 	input  wire       i_EXMEM_RegWrite  ,

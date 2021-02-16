@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 //`include "MIPS.v"
 
+
 module tb_mips;
 
 reg clk;
@@ -18,9 +19,9 @@ end
 
 always #10 clk = ~clk;
 
-MIPS i_MIPS (
-	.clk(clk),
-	.rst(rst)
-);
+// MIPS i_MIPS (
+// 	.clk(clk),
+// 	.rst(rst)
+// );
 
 endmodule

@@ -14,7 +14,6 @@ module IF_ID (
 
 	reg [31:0] PC_Address ;
 	reg [31:0] Instruction;
-	reg        IF_Flush   ;
 
 	always @(negedge clk) begin : proc_Registers
 		if(rst) begin
