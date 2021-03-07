@@ -1,11 +1,26 @@
 `timescale 1ns / 1ps
 
+// `include "ALU.v"
+// `include "ALU_control.v"
+// `include "Add.v"
+// `include "BranchForwarding.v"
+// `include "Control.v"
+// `include "Data_memory.v"
+// `include "EX_MEM.v"
+// `include "Forwarding_unit.v"
+// `include "Hazard_detec_unit.v"
+// `include "ID_EX.v"
+// `include "IF_ID.v"
+// `include "Instruction_memory.v"
+// `include "JR_Control.v"
+// `include "MEM_WB.v"
+// `include "Mux.v"
+// `include "MuxControl.v"
+// `include "MuxCuatro.v"
+// `include "MuxTres.v"
+// `include "PC.v"
+// `include "Registers.v"
 
-`include "Mux.v" `include "MuxCuatro.v" `include "PC.v" `include "Add.v" `include "Instruction_memory.v" `include "IF_ID.v"
-`include "Registers.v" `include "Control.v" `include "ID_EX.v" `include "Forwarding_unit.v" `include "BranchForwarding.v"
-`include "ALU_control.v" `include "ALU.v" `include "EX_MEM.v" `include "Data_memory.v"
-`include "MEM_WB.v" `include "JR_Control.v" `include "MuxTres.v" `include "Hazard_detec_unit.v"
-`include "MuxControl.v"
 
 module MIPS
 	(
@@ -231,7 +246,7 @@ assign Comparador = (Registers_to_IDEX_to_MuxJR_ReadData1 == Registers_to_IDEX_R
 
 
 
-wire       MuxControl_StallControl;
+
 wire [1:0] MuxControl_RegDst      ;
 wire [2:0] MuxControl_ALUOp       ;
 wire       MuxControl_ALUSrc      ;
@@ -249,7 +264,7 @@ wire       MuxControl_Halt        ;
 
 
 MuxControl i_MuxControl (
-	.i_StallControl(MuxControl_StallControl),
+	.i_StallControl(Stall),
 	.i_RegDst      (MuxControl_RegDst      ),
 	.i_ALUOp       (MuxControl_ALUOp       ),
 	.i_ALUSrc      (MuxControl_ALUSrc      ),
@@ -328,6 +343,7 @@ JR_Control i_JR_Control (
 ID_EX i_ID_EX (
 	.clk          (clk                                              ),
 	.rst          (rst                                              ),
+	.i_Stall      (Stall                                            ),
 	.i_PC_Address (IFID_to_IDEX_to_Add_PCAddress                    ),
 	.i_Read_data_1(Registers_to_IDEX_to_MuxJR_ReadData1             ),
 	.i_Read_data_2(Registers_to_IDEX_ReadData2                      ),

@@ -19,9 +19,9 @@ end
 
 always #10 clk = ~clk;
 
-// MIPS i_MIPS (
-// 	.clk(clk),
-// 	.rst(rst)
-// );
+MIPS i_MIPS (
+	.clk(clk),
+	.rst(rst)
+);
 
 endmodule

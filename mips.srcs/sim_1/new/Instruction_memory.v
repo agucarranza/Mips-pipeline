@@ -19,7 +19,7 @@ module Instruction_memory (
 		memory[4] = 32'h00e7_3824;
 		memory[5] = 32'h00e7_3824;
 
-		 memory[6] = 32'h9541_0000; // lhu $1, 0($10)             
+		// memory[6] = 32'h9541_0000; // lhu $1, 0($10)             
 		// memory[6] = 32'h8541_0000; // lh   $1, 0($10)             
 		// memory[6] = 32'h8141_0000; // lb   $1, 0($10)             
 		// memory[6] = 32'h0240_0809; // jalr $1, $18 
@@ -39,7 +39,7 @@ module Instruction_memory (
 		// memory[6] = 32'h0043_082a; // slt  $1, $2, $3
 		// memory[6] = 32'h0065_0823; // subu $1, $3, $5
 		// memory[6] = 32'h0065_0823; // subu $1, $3, $5
-		// memory[6] = 32'h0065_0821; // addu $1, $3, $5
+		 memory[6] = 32'h0065_0821; // addu $1, $3, $5
 		// memory[6] = 32'h00a3_0807; // srav $1, $3, $5
 		// memory[6] = 32'h00a3_0806; // srlv $1, $3, $5
 		// memory[6] = 32'h00a2_0804; // sllv $1, $2, $5
@@ -49,7 +49,7 @@ module Instruction_memory (
 		// memory[6] = 32'h0002_08c0; // sll  $1, $2, 3
      	// memory[6] = 32'h8c23_0000; // lw 	OK!
 	 	// memory[6] = 32'hac23_0000; // sw 	OK!
-	 	// memory[6] = 32'h0043_0820; // add 	OK!
+	 	// memory[6] = 32'h0043_0820; // add 	OK! $n, $t, $r
 	 	// memory[6] = 32'h1026_0006; // beq --+
 								    //		\
 								    //		\
