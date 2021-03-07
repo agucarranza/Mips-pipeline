@@ -407,19 +407,19 @@ module Control (
 			end
 
 			HLT : begin
-				Signed   = 1'bX  ;
-				RegDst   = 2'bXX;
-				ALUOp    = 3'bXXX;
-				ALUSrc   = 1'bX;
-				Branch   = 1'bX;
-				Branchne = 1'bX;
-				MemRead  = 1'bX;
+				Signed   = 1'b0  ;
+				RegDst   = 2'b01;
+				ALUOp    = 3'b011;
+				ALUSrc   = 1'b0;
+				Branch   = 1'b0;
+				Branchne = 1'b0;
+				MemRead  = 1'b0;
 				MemWrite = 1'b0;
 				RegWrite = 1'b0;
-				MemtoReg = 2'bXX;
-				Jump     = 1'bX;
-				MemSign  = 1'bX;
-				Long     = 2'bXX;
+				MemtoReg = 2'b00;
+				Jump     = 1'b0;
+				MemSign  = 1'b0;
+				Long     = 2'b00;
 				Halt     = 1'b1;
 			end
 
@@ -458,9 +458,5 @@ module Control (
 	assign o_Long     = Long    ;
 	assign o_MemSign  = MemSign ;
 	assign o_Halt     = Halt    ;
-
-	// Riesgos
-
-	wire IF_Flush = o_Branch | o_Branchne | o_Jump ; 
 
 endmodule

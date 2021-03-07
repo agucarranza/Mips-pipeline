@@ -1,25 +1,25 @@
 `timescale 1ns / 1ps
 
-// `include "ALU.v"
-// `include "ALU_control.v"
-// `include "Add.v"
-// `include "BranchForwarding.v"
-// `include "Control.v"
-// `include "Data_memory.v"
-// `include "EX_MEM.v"
-// `include "Forwarding_unit.v"
-// `include "Hazard_detec_unit.v"
-// `include "ID_EX.v"
-// `include "IF_ID.v"
-// `include "Instruction_memory.v"
-// `include "JR_Control.v"
-// `include "MEM_WB.v"
-// `include "Mux.v"
-// `include "MuxControl.v"
-// `include "MuxCuatro.v"
-// `include "MuxTres.v"
-// `include "PC.v"
-// `include "Registers.v"
+`include "ALU.v"
+`include "ALU_control.v"
+`include "Add.v"
+`include "BranchForwarding.v"
+`include "Control.v"
+`include "Data_memory.v"
+`include "EX_MEM.v"
+`include "Forwarding_unit.v"
+`include "Hazard_detec_unit.v"
+`include "ID_EX.v"
+`include "IF_ID.v"
+`include "Instruction_memory.v"
+`include "JR_Control.v"
+`include "MEM_WB.v"
+`include "Mux.v"
+`include "MuxControl.v"
+`include "MuxCuatro.v"
+`include "MuxTres.v"
+`include "PC.v"
+`include "Registers.v"
 
 
 module MIPS
@@ -141,7 +141,8 @@ Mux i_Mux_JR (
 PC i_PC (
 	.i_clk    (clk                   ),
 	.i_rst    (rst                   ),
-	.i_enable (~Stall                ),
+	.i_Stall  (Stall                ),
+	.i_Halt   (Halt                  ),
 	.i_address(MuxJR_to_PC           ),
 	.o_address(PC_to_AddPC_to_InstMem)
 );

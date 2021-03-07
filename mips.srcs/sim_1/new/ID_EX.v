@@ -89,7 +89,7 @@ module ID_EX (
             ALUSrc   <= 1'b0;
             JALRCtrl <= 1'b0;
 
-        end else if (i_Stall) begin
+        end else if (i_Stall) begin //se transforma en una NOP
 
             PC_Address  <= i_PC_Address;
             Read_data_1 <= 32'b0;

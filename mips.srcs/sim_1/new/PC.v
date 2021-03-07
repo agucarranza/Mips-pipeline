@@ -3,7 +3,8 @@
 module PC (
 	input  wire        i_clk    ,
 	input  wire        i_rst    ,
-	input  wire        i_enable ,
+	input  wire        i_Stall  ,
+	input  wire        i_Halt   ,
 	input  wire [31:0] i_address,
 	output wire [31:0] o_address
 );
@@ -14,7 +15,9 @@ module PC (
 	always @(negedge i_clk) begin
 		if (i_rst) 
 			ProgCounter <= 32'b0;
-		else if (i_enable)
+		else if (i_Halt)
+			ProgCounter <= ProgCounter;
+		else if (~i_Stall)
 			ProgCounter <= i_address;		
 	end
 
